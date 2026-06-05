@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Send SMS</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  input, select, button { margin: 5px 0; padding: 8px; width: 250px; }
+</style>
+</head>
+<body>
+
+  <input id="message" placeholder="Сообщение">
+  <input id="user" placeholder="Имя">
+  <select id="smsType">
+    <option value="normal">normal</option>
+    <option value="vip">vip</option>
+    <option value="glamour">glamour</option>
+    <option value="express">express</option>
+  </select>
+  <button onclick="sendMessage()">Отправить</button>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBb10uNIY5YyjVPIbpKxZEMEYQF_flTDrA",
+      authDomain: "testermode-1.firebaseapp.com",
+      databaseURL: "https://testermode-1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "testermode-1",
+      storageBucket: "testermode-1.firebasestorage.app",
+      messagingSenderId: "881614741843",
+      appId: "1:881614741843:web:5b5b037229b32618f5c1a6",
+      measurementId: "G-S3M8MGX52B"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function sendMessage() {
+      const message = document.getElementById('message').value.trim();
+      const user = document.getElementById('user').value.trim();
+      const smsType = document.getElementById('smsType').value;
+
+      if (!message) return;
+
+      db.ref('messages').push({
+        message,
+        user,
+        displayName: user || 'BTV',
+        smsType,
+        source: 'moderator',
+        senderRole: 'moderator',
+        ts: Date.now()
+      });
+
+      document.getElementById('message').value = '';
+      document.getElementById('user').value = '';
+      document.getElementById('smsType').value = 'normal';
+    }
+  </script>
+
+</body>
+</html>

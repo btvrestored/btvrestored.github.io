@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&subset=cyrillic,latin&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f2f2f2;
+      --panel:#fff;
+      --black:#070707;
+      --orange:#ff6a00;
+      --text:#222;
+      --line:#e6e6e6;
+      --blue:#235fa8;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: 'Roboto', Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg,#fbfbfb 0%, #ededed 42%, #d8d8d8 100%);
+      color:var(--text);
+    }
+    a{color:inherit;text-decoration:none}
+    .page{
+      width:min(1000px, calc(100% - 24px));
+      margin:14px auto 24px;
+      background:var(--panel);
+      box-shadow:0 0 0 1px rgba(0,0,0,.06);
+    }
+    header{
+      background:var(--black);
+      color:#fff;
+      padding:18px 22px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+    }
+    .logo{
+      display:flex;
+      align-items:baseline;
+      gap:6px;
+      font-size:34px;
+      font-weight:900;
+      letter-spacing:-1px;
+      line-height:1;
+    }
+    .top-right{
+      text-align:right;
+      font-size:14px;
+      line-height:1.7;
+    }
+    .top-right .lang{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:6px;
+    }
+    .lang-btn{
+      background:none;
+      border:1px solid rgba(255,255,255,.35);
+      color:#fff;
+      border-radius:3px;
+      padding:2px 8px;
+      font-size:13px;
+      cursor:pointer;
+      opacity:.7;
+      transition:opacity .15s;
+    }
+    .lang-btn:hover{opacity:1}
+    .lang-btn.active{opacity:1; border-color:#fff; font-weight:700;}
+    nav{
+      display:flex;
+      justify-content:center;
+      gap:40px;
+      padding:16px 14px 15px;
+      border-bottom:1px solid #ededed;
+      font-size:16px;
+    }
+    nav a{color:#222}
+    nav a.active{color:var(--orange); font-weight:700;}
+
+    /* About content */
+    .about{
+      padding:32px 32px 40px;
+      max-width:780px;
+      margin:0 auto;
+    }
+    .about h1{
+      font-size:30px;
+      font-weight:900;
+      color:var(--black);
+      margin:0 0 6px;
+      letter-spacing:-.5px;
+    }
+    .about h1 span{
+      color:var(--orange);
+    }
+    .about .subtitle{
+      font-size:16px;
+      color:#888;
+      margin:0 0 28px;
+    }
+    .about p{
+      font-size:16px;
+      line-height:1.7;
+      color:#333;
+      margin:0 0 16px;
+    }
+    .divider{
+      border:none;
+      border-top:2px solid var(--orange);
+      width:48px;
+      margin:24px 0;
+    }
+    .about h2{
+      font-size:20px;
+      font-weight:700;
+      color:var(--black);
+      margin:0 0 14px;
+    }
+    .social-links{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-top:28px;
+    }
+    .social-link{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 20px;
+      border-radius:4px;
+      font-size:15px;
+      font-weight:700;
+      text-decoration:none;
+      transition:opacity .15s;
+    }
+    .social-link:hover{opacity:.85}
+    .social-link.tg{
+      background:#229ED9;
+      color:#fff;
+    }
+    .social-link.vk{
+      background:#0077FF;
+      color:#fff;
+    }
+    .social-link svg{
+      width:20px;
+      height:20px;
+      fill:#fff;
+      flex-shrink:0;
+    }
+
+    footer{
+      padding:16px 18px 22px;
+      color:#777;
+      font-size:13px;
+      border-top:1px solid #eee;
+    }
+    @media (max-width: 860px){
+      header{flex-direction:column; align-items:flex-start}
+      nav{gap:16px; flex-wrap:wrap}
+      .logo{font-size:28px}
+      .about{padding:22px 18px 32px}
+      .about h1{font-size:24px}
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="logo">
+        <a href="index.html">
+          <img src="logo.png" alt="BRIDGE TV" height="48">
+        </a>
+      </div>
+      <div class="top-right">
+        <div class="lang">
+          language:
+          <button class="lang-btn active" onclick="setLang('en')">🇬🇧 EN</button>
+          <button class="lang-btn" onclick="setLang('ru')">🇷🇺 RU</button>
+        </div>
+      </div>
+    </header>
+
+    <nav>
+      <a href="shows.html" data-i18n="nav_shows">Shows</a>
+      <a href="#" data-i18n="nav_schedule">Schedule</a>
+      <a href="about.html" class="active" data-i18n="nav_about">About</a>
+      <a href="#" data-i18n="nav_contact">Contact</a>
+    </nav>
+
+    <div class="about">
+      <h1>BRIDGE TV <span>Project Restored</span></h1>
+      <p class="subtitle" data-i18n="subtitle">Fan project · Est. 2024</p>
+
+      <p data-i18n="p1">BRIDGE TV вышел в эфир 1 июня 2005 года — его основали Валерий Кушников, Игорь Чуев и Фёдор Стрижков. Идея канала родилась неожиданно: Кушников продюсировал группу «Бридж», которая никак не могла попасть в ротацию существующих музыкальных каналов. Вместо того чтобы продолжать ломиться в закрытые двери, основатели решили создать собственный канал — и назвали его в честь группы.</p>
+
+      <p data-i18n="p2">С самого начала BRIDGE TV позиционировал себя как «первый альтернативный». Канал специализировался на зарубежной музыке самых разных направлений: евро-поп, рок, R&B, электроника, ретро 70-х, 80-х и 90-х. Здесь звучали исполнители, которых не встретишь в обычной ротации — те, кого любят, но не показывают. В этом было главное отличие от MTV и МУЗ-ТВ, гнавшихся за трендами и рейтингами.</p>
+
+      <p data-i18n="p3">Со временем канал обрёл собственное лицо через авторские программы. «Baby Time» — ежедневный детский блок с мультфрагментами и детскими клипами. «Bridge in Time» — ностальгическое путешествие по музыкальным эпохам с архивными концертными записями. «Bridge to Nightlife» — ночная программа с клубной и танцевальной электроникой. «Rock Party Time» — рок и альтернатива. В 2006 году запустили живой SMS-чат с диджеями, где зрители могли общаться и заказывать клипы прямо в эфире — редкость для кабельного канала того времени.</p>
+
+      <p data-i18n="p4">В 2009 году появилась собственная видеопроизводственная компания Bridge Production. В 2010 году для русскоязычной музыки запустили отдельный канал — Rusong TV. Постепенно вокруг BRIDGE TV сложилась целая экосистема: несколько тематических каналов, онлайн-радиостанции, собственная коллекция из более чем 10 000 лицензированных клипов.</p>
+
+      <p data-i18n="p5">1 ноября 2016 года состоялась масштабная перезагрузка: переход на широкоэкранный формат 16:9, полное обновление контента и визуального стиля. Канал сменил облик и характер — та атмосфера, которую BRIDGE TV создавал на протяжении одиннадцати лет, ушла вместе со старым форматом. Для многих зрителей этот день стал концом эпохи.</p>
+
+      <hr class="divider">
+
+      <h2 data-i18n="about_project_title">О проекте</h2>
+      <p data-i18n="p6">Project Restored — фанатская инициатива, цель которой — возродить дух оригинального BRIDGE TV таким, каким он был до 2016 года. Мы собираем архивные записи эфиров, классические клипы из ротации канала и воссоздаём ту атмосферу, которая делала BRIDGE TV особенным — его стиль, программы и ощущение живого, непохожего на других телевидения.</p>
+
+      <p data-i18n="p7">Но мы не стоим на месте. Помимо архивов, Project Restored показывает и новую музыку — свежих исполнителей и треки, которые вписываются в дух оригинального канала и которые старый BRIDGE TV точно поставил бы в ротацию. Мы не музей, а живой канал. Если вы росли под этот канал или открыли его для себя позже — вы дома.</p>
+
+      <hr class="divider">
+
+      <h2 data-i18n="follow_us">Мы в соцсетях</h2>
+      <p data-i18n="follow_desc">Следите за эфирами, архивами и новостями сообщества:</p>
+
+      <div class="social-links">
+        <a href="https://t.me/btv_restored" class="social-link tg" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.17 13.857l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.978.702z"/>
+          </svg>
+          Telegram
+        </a>
+        <a href="https://vk.com/btv_restored" class="social-link vk" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.391 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1-1.49-1.135-1.744-1.135-.356 0-.458.102-.458.593v1.575c0 .424-.135.678-1.253.678-1.846 0-3.896-1.118-5.335-3.202C4.624 10.857 4.03 8.57 4.03 8.096c0-.254.102-.491.593-.491h1.744c.44 0 .61.203.779.678.864 2.49 2.303 4.675 2.896 4.675.22 0 .322-.102.322-.66V9.721c-.068-1.186-.695-1.287-.695-1.71 0-.203.17-.407.44-.407h2.743c.372 0 .508.203.508.643v3.473c0 .372.17.508.271.508.22 0 .407-.136.813-.542 1.253-1.406 2.151-3.574 2.151-3.574.119-.254.322-.491.762-.491h1.744c.525 0 .643.271.525.643-.22 1.017-2.354 4.031-2.354 4.031-.186.305-.254.44 0 .78.186.254.796.779 1.203 1.253.745.847 1.32 1.558 1.473 2.05.17.491-.085.745-.576.745z"/>
+          </svg>
+          VK Community
+        </a>
+      </div>
+    </div>
+
+    <footer>
+      <span data-i18n="footer">Presented by BM-PR. Not affiliated with BRIDGE MEDIA.</span>
+    </footer>
+  </div>
+
+  <script>
+    const i18n = {
+      en: {
+        nav_shows:    'Shows',
+        nav_schedule: 'Schedule',
+        nav_about:    'About',
+        nav_contact:  'Contact',
+        subtitle:     'Fan project · Est. 2024',
+        p1: 'BRIDGE TV launched on June 1, 2005, founded by Valery Kushnikov, Igor Chuev and Fyodor Strizhkov. The idea grew out of frustration: Kushnikov was managing a music group called Bridge that couldn\'t get airtime on any existing channel. Instead of fighting for a slot, the founders built their own.',
+        p2: 'From the start, BRIDGE TV positioned itself as the "first alternative" music channel in Russia — focused on foreign music across a wide range of genres: euro-pop, rock, R&B, electronica, and retro hits from the 70s, 80s and 90s. Unlike MTV or MUZ-TV chasing mainstream charts, BRIDGE TV played artists you genuinely loved but rarely saw elsewhere.',
+        p3: 'Over the years the channel built its own identity through original programming: the children\'s block "Baby Time", the nostalgic "Bridge in Time" with archive concert footage, the late-night club show "Bridge to Nightlife", and the rock-focused "Rock Party Time". In 2006 a live SMS chat with the DJs launched, letting viewers request clips in real time — rare for a cable channel back then. By 2009 the channel had its own production company; in 2010, a separate channel for Russian-language music — Rusong TV — was launched.',
+        p4: 'The channel assembled a library of over 10,000 licensed music videos, many acquired exclusively for Russian audiences. It became an ecosystem: multiple themed channels, online radio stations, and a community of viewers who found something on BRIDGE TV they couldn\'t find anywhere else.',
+        p5: 'On November 1, 2016, BRIDGE TV underwent a major relaunch: a switch to 16:9 widescreen, a complete content overhaul, and a new visual identity. The distinctive character built over eleven years was gone. For many loyal viewers, that day was the end of an era.',
+        about_project_title: 'About the project',
+        p6: 'Project Restored is a fan-driven initiative dedicated to bringing back the spirit of the original BRIDGE TV as it was before 2016. We collect archive broadcasts, classic clips from the channel\'s rotation, and recreate the atmosphere that made it special — its style, its shows, and that feeling of genuinely unique television.',
+        p7: 'But we\'re not standing still. Alongside the archives, Project Restored curates and broadcasts new music that fits the spirit of the original channel — fresh artists and tracks that the old BRIDGE TV would have loved. We\'re not a museum; we\'re a living channel. Whether you grew up with BRIDGE TV or discovered it later — you\'re home.',
+        follow_us:    'Follow us',
+        follow_desc:  'Stay up to date with broadcasts, archives, and community updates:',
+        footer:       'Presented by BM-PR. Not affiliated with BRIDGE MEDIA.',
+      },
+      ru: {
+        nav_shows:    'Программы',
+        nav_schedule: 'Телепрограмма',
+        nav_about:    'О телеканале',
+        nav_contact:  'Контакты',
+        subtitle:     'Фан-проект · С 2024 года',
+        p1: 'BRIDGE TV вышел в эфир 1 июня 2005 года — его основали Валерий Кушников, Игорь Чуев и Фёдор Стрижков. Идея канала родилась неожиданно: Кушников продюсировал группу «Бридж», которая никак не могла попасть в ротацию существующих музыкальных каналов. Вместо того чтобы продолжать ломиться в закрытые двери, основатели решили создать собственный канал — и назвали его в честь группы.',
+        p2: 'С самого начала BRIDGE TV позиционировал себя как «первый альтернативный». Канал специализировался на зарубежной музыке самых разных направлений: евро-поп, рок, R&B, электроника, ретро 70-х, 80-х и 90-х. Здесь звучали исполнители, которых не встретишь в обычной ротации — те, кого любят, но не показывают. В этом было главное отличие от MTV и МУЗ-ТВ, гнавшихся за трендами и рейтингами.',
+        p3: 'Со временем канал обрёл собственное лицо через авторские программы. «Baby Time» — ежедневный детский блок с мультфрагментами и детскими клипами. «Bridge in Time» — ностальгическое путешествие по музыкальным эпохам с архивными концертными записями. «Bridge to Nightlife» — ночная программа с клубной и танцевальной электроникой. «Rock Party Time» — рок и альтернатива. В 2006 году запустили живой SMS-чат с диджеями, где зрители могли заказывать клипы прямо в эфире — редкость для кабельного канала того времени.',
+        p4: 'В 2009 году появилась собственная видеопроизводственная компания Bridge Production. В 2010 году для русскоязычной музыки запустили отдельный канал — Rusong TV. Постепенно вокруг BRIDGE TV сложилась целая экосистема: несколько тематических каналов, онлайн-радиостанции, собственная коллекция из более чем 10 000 лицензированных клипов.',
+        p5: '1 ноября 2016 года состоялась масштабная перезагрузка: переход на широкоэкранный формат 16:9, полное обновление контента и визуального стиля. Канал сменил облик и характер — та атмосфера, которую BRIDGE TV создавал на протяжении одиннадцати лет, ушла вместе со старым форматом. Для многих зрителей этот день стал концом эпохи.',
+        about_project_title: 'О проекте',
+        p6: 'Project Restored — фанатская инициатива, цель которой — возродить дух оригинального BRIDGE TV таким, каким он был до 2016 года. Мы собираем архивные записи эфиров, классические клипы из ротации канала и воссоздаём ту атмосферу, которая делала BRIDGE TV особенным — его стиль, программы и ощущение живого, непохожего на других телевидения.',
+        p7: 'Но мы не стоим на месте. Помимо архивов, Project Restored показывает и новую музыку — свежих исполнителей и треки, которые вписываются в дух оригинального канала и которые старый BRIDGE TV точно поставил бы в ротацию. Мы не музей, а живой канал. Если вы росли под этот канал или открыли его для себя позже — вы дома.',
+        follow_us:    'Мы в соцсетях',
+        follow_desc:  'Следите за эфирами, архивами и новостями сообщества:',
+        footer:       'Представлено командой BM-PR. Не имеет отношения к BRIDGE MEDIA.',
+      }
+    };
+
+    function setLang(lang) {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (i18n[lang][key]) el.textContent = i18n[lang][key];
+      });
+      document.documentElement.lang = lang;
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('onclick').includes(`'${lang}'`));
+      });
+      localStorage.setItem('lang', lang);
+    }
+
+    // Apply saved language on page load
+    const savedLang = localStorage.getItem('lang') || 'ru';
+    setLang(savedLang);
+  </script>
+</body>
+</html>

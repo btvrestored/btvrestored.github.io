@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Получение сообщений</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: transparent;
+    font-family: Arial, sans-serif;
+    color: white;
+    overflow-x: hidden;
+  }
+  #ticker-wrapper {
+    position: relative;
+    width: 475px;
+    height: 12em;
+    margin: 20px auto;
+    padding: 0 10px;
+    box-sizing: border-box;
+    user-select: none;
+    overflow: hidden;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    background: transparent;
+  }
+  body {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8), 0 0 5px rgba(0, 0, 0, 0.5);
+  }
+  .message {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 5px;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    text-align: center;
+    top: 0;
+    transform: translateY(0);
+    font-size: 1.1em;
+    line-height: 1.4em;
+    min-height: 5em;
+  }
+  .normal { color: white; }
+  .vip { color: orange; }
+  .glamour { color: purple; }
+  .express { color: yellow; }
+  .role-moderator { color: #ead8b0 !important; }
+</style>
+</head>
+<body>
+
+<div id="ticker-wrapper">
+  <div id="currentMessage" class="message normal"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBb10uNIY5YyjVPIbpKxZEMEYQF_flTDrA",
+    authDomain: "testermode-1.firebaseapp.com",
+    databaseURL: "https://testermode-1-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "testermode-1",
+    storageBucket: "testermode-1.firebasestorage.app",
+    messagingSenderId: "881614741843",
+    appId: "1:881614741843:web:5b5b037229b32618f5c1a6",
+    measurementId: "G-S3M8MGX52B"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  const wrapper = document.getElementById('ticker-wrapper');
+  let currentDiv = document.getElementById('currentMessage');
+  let animating = false;
+  let queue = [];
+
+  function cleanString(str) {
+    return typeof str === 'string' ? str.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim() : '';
+  }
+
+  function createMessageDiv(text, smsType, senderRole) {
+    const div = document.createElement('div');
+    const safeType = ['normal', 'vip', 'glamour', 'express'].includes(smsType) ? smsType : 'normal';
+    const safeRole = senderRole === 'viewer' ? 'viewer' : 'moderator';
+    div.className = 'message ' + safeType + ' role-' + safeRole;
+    div.textContent = text;
+    div.style.top = '100%';
+    return div;
+  }
+
+  function animateOldMessageUp(oldDiv, duration = 1500) {
+    return new Promise(resolve => {
+      const start = performance.now();
+      function step(time) {
+        const p = Math.min((time - start) / duration, 1);
+        oldDiv.style.transform = `translateY(${-p * 100}%)`;
+        if (p < 1) requestAnimationFrame(step);
+        else resolve();
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  function animateNewMessageIn(newDiv, duration = 1500) {
+    return new Promise(resolve => {
+      const start = performance.now();
+      function step(time) {
+        const p = Math.min((time - start) / duration, 1);
+        newDiv.style.top = (100 - p * 100) + '%';
+        if (p < 1) requestAnimationFrame(step);
+        else resolve();
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  async function showMessage(message, userName, smsType, senderRole) {
+    if (animating) {
+      queue.push({ message, userName, smsType, senderRole });
+      return;
+    }
+
+    animating = true;
+
+    if (currentDiv) {
+      await animateOldMessageUp(currentDiv);
+      if (currentDiv.parentNode) currentDiv.remove();
+    }
+
+    const cleanedMessage = cleanString(message);
+    const cleanedUser = cleanString(userName);
+    const role = senderRole === 'viewer' ? 'viewer' : 'moderator';
+    let fullText;
+
+    if (role === 'viewer') {
+      fullText = `${cleanedUser || 'Зритель'}: ${cleanedMessage}`;
+    } else {
+      fullText = cleanedUser
+        ? `Модератор канала (${cleanedUser}): ${cleanedMessage}`
+        : `Модератор канала: ${cleanedMessage}`;
+    }
+
+    const newDiv = createMessageDiv(fullText, smsType, role);
+    wrapper.appendChild(newDiv);
+    currentDiv = newDiv;
+
+    await animateNewMessageIn(newDiv);
+
+    animating = false;
+
+    if (queue.length > 0) {
+      const next = queue.shift();
+      showMessage(next.message, next.userName, next.smsType, next.senderRole);
+    }
+  }
+
+  db.ref('messages').on('child_added', snapshot => {
+    const data = snapshot.val() || {};
+    showMessage(
+      data.message || '',
+      data.displayName || data.user || '',
+      data.smsType || 'normal',
+      data.senderRole || data.source || 'moderator'
+    );
+  });
+</script>
+
+</body>
+</html>

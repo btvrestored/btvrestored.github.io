@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BRIDGE TV - Project Restored</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&subset=cyrillic,latin&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f2f2f2;
+      --panel:#fff;
+      --black:#070707;
+      --orange:#ff6a00;
+      --orange2:#ff8a2d;
+      --text:#222;
+      --line:#e6e6e6;
+      --blue:#235fa8;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: 'Roboto', Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg,#fbfbfb 0%, #ededed 42%, #d8d8d8 100%);
+      color:var(--text);
+    }
+    a{color:inherit;text-decoration:none}
+    .page{
+      width:min(1000px, calc(100% - 24px));
+      margin:14px auto 24px;
+      background:var(--panel);
+      box-shadow:0 0 0 1px rgba(0,0,0,.06);
+    }
+    header{
+      background:var(--black);
+      color:#fff;
+      padding:18px 22px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+    }
+    .logo{
+      display:flex;
+      align-items:baseline;
+      gap:6px;
+      font-size:34px;
+      font-weight:900;
+      letter-spacing:-1px;
+      line-height:1;
+    }
+    .logo span:last-child{
+      background:var(--orange);
+      color:#111;
+      padding:0 8px;
+      border-radius:2px;
+    }
+    .top-right{
+      text-align:right;
+      font-size:14px;
+      line-height:1.7;
+    }
+    .top-right .lang{
+      opacity:.95;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:6px;
+    }
+    nav{
+      display:flex;
+      justify-content:center;
+      gap:40px;
+      padding:16px 14px 15px;
+      border-bottom:1px solid #ededed;
+      font-size:16px;
+    }
+    nav a{color:#222}
+    .main{
+      display:grid;
+      grid-template-columns:1fr 195px;
+      gap:18px;
+      padding:18px 18px 0;
+    }
+    .hero{
+      background:linear-gradient(180deg,#ff4d52 0%, #ff8c35 100%);
+      border:3px solid #ffb26a;
+      border-radius:6px;
+      min-height:256px;
+      color:#fff;
+      padding:18px 22px;
+      text-align:center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
+    }
+    .hero h1{
+      margin:0 0 28px;
+      font-size:52px;
+      line-height:1.04;
+      letter-spacing:-1px;
+    }
+    .hero p{
+      margin:12px auto;
+      font-size:18px;
+      line-height:1.45;
+      max-width:760px;
+    }
+    .hero a{
+      display:inline-block;
+      margin-top:34px;
+      color:var(--blue);
+      font-size:18px;
+      text-decoration:underline;
+      font-weight:700;
+    }
+    .side .promo{
+      border:1px solid var(--line);
+      background:#fff;
+      margin-bottom:18px;
+    }
+    .side .promo h3{
+      margin:0;
+      padding:10px 12px;
+      background:#111;
+      color:#fff;
+      font-size:18px;
+      text-align:center;
+    }
+    .ad{
+      height:250px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.16), rgba(0,0,0,.14)),
+        linear-gradient(180deg, #cffd2b 0%, #95d800 100%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      color:#122;
+      font-size:26px;
+      text-align:center;
+      padding:14px;
+    }
+    .now{
+      background:linear-gradient(180deg, #ff8a35 0%, #ff6f16 100%);
+      color:#fff;
+      border-radius:4px;
+      overflow:hidden;
+    }
+    .now h3{
+      margin:0;
+      padding:14px 14px 10px;
+      font-size:18px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .schedule{
+      padding:0 14px 12px;
+      font-size:14px;
+    }
+    .schedule div{
+      border-top:1px solid rgba(255,255,255,.25);
+      padding:9px 0;
+      line-height:1.35;
+    }
+    .schedule b{display:block}
+    .section{
+      padding:18px 18px 20px;
+    }
+    .section h2{
+      margin:0 0 14px;
+      color:#e46500;
+      font-size:24px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:18px;
+    }
+    .card .img{
+      height:100px;
+      border-radius:2px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.2), rgba(0,0,0,.18)),
+        linear-gradient(135deg, #2941ff, #8ad7ff);
+    }
+    .card:nth-child(2) .img{
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.2), rgba(0,0,0,.18)),
+        linear-gradient(135deg, #6b4c32, #ead8b0);
+    }
+    .card:nth-child(3) .img{
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.2), rgba(0,0,0,.18)),
+        linear-gradient(135deg, #2b0e2f, #ff5ea8);
+    }
+    .card h4{
+      margin:10px 0 7px;
+      color:var(--blue);
+      font-size:16px;
+      text-decoration:underline;
+    }
+    .card p{
+      margin:0;
+      font-size:14px;
+      line-height:1.45;
+      color:#333;
+    }
+    .lang-btn{
+      background:none;
+      border:1px solid rgba(255,255,255,.35);
+      color:#fff;
+      border-radius:3px;
+      padding:2px 8px;
+      font-size:13px;
+      cursor:pointer;
+      opacity:.7;
+      transition:opacity .15s;
+    }
+    .lang-btn:hover{opacity:1}
+    .lang-btn.active{opacity:1; border-color:#fff; font-weight:700;}
+    footer{
+      padding:16px 18px 22px;
+      color:#777;
+      font-size:13px;
+      border-top:1px solid #eee;
+    }
+    .video-frame{
+      position:relative;
+      width:100%;
+      aspect-ratio:16/9;
+      min-height:220px;
+      background:#000;
+      border-radius:6px;
+      overflow:hidden;
+    }
+    .video-frame iframe{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+      background:#000;
+    }
+    .video-fallback{
+      margin-top:8px;
+      font-size:13px;
+      color:var(--blue);
+      text-decoration:underline;
+      font-weight:700;
+    }
+    @media (max-width: 860px){
+      header{flex-direction:column; align-items:flex-start}
+      .main{grid-template-columns:1fr}
+      .cards{grid-template-columns:1fr}
+      nav{gap:16px; flex-wrap:wrap}
+      .logo{font-size:28px}
+      .hero h1{font-size:34px}
+      .hero p{font-size:17px}
+      .video-frame{min-height:180px}
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="logo">
+        <img src="logo.png" alt="BRIDGE TV" height="48">
+      </div>
+      <div class="top-right">
+        <div class="lang">
+          language:
+          <button class="lang-btn active" onclick="setLang('en')">🇬🇧 EN</button>
+          <button class="lang-btn" onclick="setLang('ru')">🇷🇺 RU</button>
+        </div>
+      </div>
+    </header>
+
+    <nav>
+      <a href="shows.html" data-i18n="nav_shows">Shows</a>
+      <a href="#" data-i18n="nav_schedule">Schedule</a>
+      <a href="about.html" data-i18n="nav_about">About</a>
+      <a href="#" data-i18n="nav_contact">Contact</a>
+    </nav>
+
+    <section style="padding:18px 18px 0">
+      <!-- Responsive video wrapper -->
+      <div class="video-frame">
+        <iframe
+          src="https://live.vkvideo.ru/app/embed/btvrestored"
+          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+          allowfullscreen="true"
+          loading="eager"
+          referrerpolicy="strict-origin-when-cross-origin"
+          scrolling="no">
+        </iframe>
+      </div>
+      <a class="video-fallback" href="https://live.vkvideo.ru/btvrestored" target="_blank" rel="noopener" data-i18n="video_fallback">Open live video</a>
+    </section>
+
+    <!-- Viewer message form -->
+    <section style="padding:14px 18px 0">
+      <div id="msg-box" style="
+        background:#f7f7f7;
+        border:1px solid #e0e0e0;
+        border-radius:6px;
+        padding:16px 18px;
+      ">
+        <div style="font-weight:700;font-size:15px;margin-bottom:12px;color:#222;display:flex;align-items:center;gap:8px;">
+          <span style="
+            background:var(--orange);color:#fff;
+            border-radius:3px;padding:1px 8px;font-size:12px;
+            letter-spacing:.04em;
+          ">LIVE</span>
+          <span data-i18n="msg_title">Написать на экран</span>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
+          <div style="flex:2;min-width:180px;">
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;" data-i18n="msg_label_text">Сообщение</label>
+            <input id="msgText" type="text" maxlength="120"
+              style="width:100%;padding:9px 11px;border:1px solid #ddd;border-radius:4px;font-size:14px;font-family:inherit;outline:none;"
+              data-i18n-placeholder="msg_placeholder"
+              placeholder="Ваше сообщение…">
+          </div>
+          <div style="flex:1;min-width:120px;">
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;" data-i18n="msg_label_name">Имя</label>
+            <input id="msgUser" type="text" maxlength="32"
+              style="width:100%;padding:9px 11px;border:1px solid #ddd;border-radius:4px;font-size:14px;font-family:inherit;outline:none;"
+              data-i18n-placeholder="msg_placeholder_name"
+              placeholder="Ваше имя">
+          </div>
+          <div style="flex:0 0 auto;">
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;" data-i18n="msg_label_type">Тип</label>
+            <select id="msgType"
+              style="padding:9px 11px;border:1px solid #ddd;border-radius:4px;font-size:14px;font-family:inherit;background:#fff;outline:none;cursor:pointer;">
+              <option value="normal">Normal</option>
+              <option value="vip">⭐ VIP</option>
+              <option value="glamour">💜 Glamour</option>
+              <option value="express">⚡ Express</option>
+            </select>
+          </div>
+          <div style="flex:0 0 auto;">
+            <button id="msgBtn" onclick="submitMsg()"
+              style="padding:9px 22px;background:var(--orange);color:#fff;border:none;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s;"
+              data-i18n="msg_send">Отправить</button>
+          </div>
+        </div>
+
+        <div id="msgFeedback" style="margin-top:10px;font-size:13px;min-height:18px;"></div>
+      </div>
+    </section>
+
+
+
+
+    <footer>
+      <span data-i18n="footer">Presented by BM-PR. Not affiated with BRIDGE MEDIA.</span>
+    </footer>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey:            "AIzaSyBb10uNIY5YyjVPIbpKxZEMEYQF_flTDrA",
+      authDomain:        "testermode-1.firebaseapp.com",
+      databaseURL:       "https://testermode-1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId:         "testermode-1",
+      storageBucket:     "testermode-1.firebasestorage.app",
+      messagingSenderId: "881614741843",
+      appId:             "1:881614741843:web:5b5b037229b32618f5c1a6"
+    });
+    const db = firebase.database();
+    const VIEWER_COOLDOWN_MS = 30000;
+    const VIEWER_COOLDOWN_KEY = 'btv_viewer_last_sent_at';
+    const VIEWER_NAME_KEY = 'btv_viewer_name';
+    let lastSent = Number(localStorage.getItem(VIEWER_COOLDOWN_KEY) || 0);
+    let cooldownTimer = null;
+    let curLang = 'en';
+
+    function submitMsg() {
+      const text = document.getElementById('msgText').value.trim();
+      const user = document.getElementById('msgUser').value.trim();
+      const type = document.getElementById('msgType').value;
+
+      if (!text) { showFb('\u26a0 ' + (curLang==='ru' ? '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435' : 'Please enter a message'), '#e46500'); return; }
+      if (!user) { showFb('\u26a0 ' + (curLang==='ru' ? '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0438\u043c\u044f' : 'Please enter your name'), '#e46500'); return; }
+
+      const remaining = getCooldownRemaining();
+      if (remaining > 0) {
+        showFb('\u23f3 ' + cooldownText(remaining), '#999');
+        updateCooldownButton();
+        return;
+      }
+
+      const btn = document.getElementById('msgBtn');
+      btn.disabled = true;
+      db.ref('inbox').push({
+        message: text,
+        user: user,
+        displayName: user,
+        smsType: type,
+        source: 'viewer',
+        senderRole: 'viewer',
+        cooldownMs: VIEWER_COOLDOWN_MS,
+        ts: Date.now(),
+        approved: false
+      })
+        .then(() => {
+          lastSent = Date.now();
+          localStorage.setItem(VIEWER_COOLDOWN_KEY, String(lastSent));
+          localStorage.setItem(VIEWER_NAME_KEY, user);
+          document.getElementById('msgText').value = '';
+          showFb('\u2713 ' + (curLang==='ru' ? '\u0421\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435 \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043e!' : 'Message sent!'), '#2a9a2a');
+          updateCooldownButton();
+        })
+        .catch(function(err) { showFb('\u2715 ' + err.message, '#c0392b'); })
+        .finally(function() { updateCooldownButton(); });
+    }
+
+    function showFb(msg, color) {
+      var el = document.getElementById('msgFeedback');
+      el.textContent = msg; el.style.color = color;
+      setTimeout(function() { el.textContent = ''; }, 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedName = localStorage.getItem(VIEWER_NAME_KEY);
+      if (savedName) document.getElementById('msgUser').value = savedName;
+      document.getElementById('msgText').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') submitMsg();
+      });
+      document.getElementById('msgUser').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') submitMsg();
+      });
+      updateCooldownButton();
+    });
+
+    function getCooldownRemaining() {
+      return Math.max(0, VIEWER_COOLDOWN_MS - (Date.now() - lastSent));
+    }
+
+    function cooldownText(ms) {
+      const seconds = Math.ceil(ms / 1000);
+      return curLang === 'ru'
+        ? '\u041f\u043e\u0434\u043e\u0436\u0434\u0438\u0442\u0435 ' + seconds + ' \u0441\u0435\u043a.'
+        : 'Please wait ' + seconds + ' sec.';
+    }
+
+    function updateCooldownButton() {
+      const btn = document.getElementById('msgBtn');
+      if (!btn) return;
+
+      const remaining = getCooldownRemaining();
+      if (remaining > 0) {
+        btn.disabled = true;
+        btn.textContent = Math.ceil(remaining / 1000) + 's';
+        if (!cooldownTimer) cooldownTimer = setInterval(updateCooldownButton, 250);
+        return;
+      }
+
+      btn.disabled = false;
+      btn.textContent = i18n[curLang].msg_send;
+      if (cooldownTimer) {
+        clearInterval(cooldownTimer);
+        cooldownTimer = null;
+      }
+    }
+  </script>
+
+  <script>
+    var i18n = {
+      en: {
+        nav_shows:           'Shows',
+        nav_schedule:        'Schedule',
+        nav_about:           'About',
+        nav_contact:         'Contact',
+        footer:              'Presented by BM-PR. Not affiated with BRIDGE MEDIA.',
+        msg_title:           'Write on screen',
+        msg_label_text:      'Message',
+        msg_label_name:      'Name',
+        msg_label_type:      'Type',
+        msg_send:            'Send',
+        video_fallback:      'Open live video',
+        msg_placeholder:     'Your message\u2026',
+        msg_placeholder_name:'Your name'
+      },
+      ru: {
+        nav_shows:           '\u041f\u0440\u043e\u0433\u0440\u0430\u043c\u043c\u044b',
+        nav_schedule:        '\u0422\u0435\u043b\u0435\u043f\u0440\u043e\u0433\u0440\u0430\u043c\u043c\u0430',
+        nav_about:           '\u041e \u0442\u0435\u043b\u0435\u043a\u0430\u043d\u0430\u043b\u0435',
+        nav_contact:         '\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u044b',
+        footer:              '\u041f\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u043e \u043a\u043e\u043c\u0430\u043d\u0434\u043e\u0439 BM-PR.',
+        msg_title:           '\u041d\u0430\u043f\u0438\u0441\u0430\u0442\u044c \u043d\u0430 \u044d\u043a\u0440\u0430\u043d',
+        msg_label_text:      '\u0421\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435',
+        msg_label_name:      '\u0418\u043c\u044f',
+        msg_label_type:      '\u0422\u0438\u043f',
+        msg_send:            '\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c',
+        video_fallback:      '\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u044d\u0444\u0438\u0440',
+        msg_placeholder:     '\u0412\u0430\u0448\u0435 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435\u2026',
+        msg_placeholder_name:'\u0412\u0430\u0448\u0435 \u0438\u043c\u044f'
+      }
+    };
+
+    function setLang(lang) {
+      curLang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        if (i18n[lang][key]) el.textContent = i18n[lang][key];
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n-placeholder');
+        if (i18n[lang][key]) el.placeholder = i18n[lang][key];
+      });
+      document.documentElement.lang = lang;
+      document.querySelectorAll('.lang-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('onclick').includes("'" + lang + "'"));
+      });
+      localStorage.setItem('lang', lang);
+      updateCooldownButton();
+    }
+
+    var savedLang = localStorage.getItem('lang') || 'en';
+    setLang(savedLang);
+  </script>
+</body>
+</html>
