@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Архив оформления - BRIDGE TV Project Restored</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&subset=cyrillic,latin&display=swap" rel="stylesheet">
+  <style>
+    :root{--panel:#fff;--black:#070707;--orange:#ff6a00;--line:#e6e6e6;--blue:#235fa8}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Roboto,Arial,sans-serif;background:linear-gradient(180deg,#fbfbfb,#d8d8d8);color:#222}
+    a{color:inherit;text-decoration:none}
+    .page{width:min(1000px,calc(100% - 24px));margin:14px auto 24px;background:var(--panel);box-shadow:0 0 0 1px rgba(0,0,0,.06)}
+    header{background:var(--black);padding:18px 22px;display:flex;justify-content:space-between;gap:16px;align-items:center}
+    .logo img{height:48px}
+    nav{display:flex;justify-content:center;gap:32px;padding:16px 14px 15px;border-bottom:1px solid #ededed;font-size:16px;flex-wrap:wrap}
+    nav a.active{color:var(--orange);font-weight:700}
+    main{padding:32px}
+    h1{margin:0 0 8px;font-size:30px;font-weight:900;letter-spacing:-.5px}
+    .subtitle{margin:0 0 28px;color:#777;line-height:1.45}
+    .timeline{display:grid;gap:18px}
+    .era{display:grid;grid-template-columns:150px 1fr;gap:18px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff}
+    .year{background:#111;color:#fff;padding:18px;font-size:24px;font-weight:900;display:flex;align-items:center;justify-content:center;text-align:center}
+    .body{padding:18px}
+    .body h2{margin:0 0 8px;font-size:20px}
+    .body p{margin:0 0 14px;color:#555;line-height:1.48}
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{border:1px solid var(--line);border-radius:3px;padding:5px 8px;font-size:12px;color:#666;background:#fafafa}
+    .jingles{margin-top:28px;border:1px solid var(--line);border-radius:6px;padding:18px;background:#f8f8f8}
+    .jingles h2{margin:0 0 10px;color:var(--orange)}
+    .jingles ul{margin:0;padding-left:20px;color:#555;line-height:1.65}
+    footer{padding:16px 18px 22px;color:#777;font-size:13px;border-top:1px solid #eee}
+    @media(max-width:700px){main{padding:22px 18px}.era{grid-template-columns:1fr}.year{justify-content:flex-start}}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header><a class="logo" href="index.html"><img src="logo.png" alt="BRIDGE TV"></a></header>
+    <nav>
+      <a href="shows.html">Программы</a>
+      <a href="top10.html">Top 10</a>
+      <a class="active" href="identity.html">Архив</a>
+      <a href="about.html">О телеканале</a>
+      <a href="order.html">Заказать клип</a>
+    </nav>
+    <main>
+      <h1>Логотипы, джинглы и оформление</h1>
+      <p class="subtitle">Короткая витрина визуальной памяти BRIDGE TV: эпохи, эфирные элементы и настроение канала до перезапуска 2016 года.</p>
+      <section class="timeline">
+        <article class="era">
+          <div class="year">2005</div>
+          <div class="body">
+            <h2>Запуск канала</h2>
+            <p>Плотная музыкальная сетка, первые эфирные отбивки и образ альтернативного музыкального ТВ.</p>
+            <div class="chips"><span class="chip">ранний логотип</span><span class="chip">кабельный эфир</span><span class="chip">альтернатива</span></div>
+          </div>
+        </article>
+        <article class="era">
+          <div class="year">2006-2009</div>
+          <div class="body">
+            <h2>SMS-чат и живой эфир</h2>
+            <p>Период, когда сообщения зрителей, заказы клипов и эфирные подписи стали частью характера канала.</p>
+            <div class="chips"><span class="chip">SMS-чат</span><span class="chip">заказы клипов</span><span class="chip">эфирные титры</span></div>
+          </div>
+        </article>
+        <article class="era">
+          <div class="year">2010-2015</div>
+          <div class="body">
+            <h2>Фирменные программы</h2>
+            <p>Baby Time, Bridge in Time, Bridge to Nightlife, Rock Party Time и Top 10 закрепили узнаваемые блоки в сетке.</p>
+            <div class="chips"><span class="chip">программы</span><span class="chip">джинглы</span><span class="chip">ночные блоки</span></div>
+          </div>
+        </article>
+      </section>
+      <section class="jingles">
+        <h2>Что добавить в архив позже</h2>
+        <ul>
+          <li>аудио-джинглы и короткие отбивки;</li>
+          <li>скриншоты старых заставок и титров;</li>
+          <li>варианты логотипов по годам;</li>
+          <li>описания программных плашек и SMS-графики.</li>
+        </ul>
+      </section>
+    </main>
+    <footer>Presented by BM-PR. Not affiated with BRIDGE MEDIA.</footer>
+  </div>
+</body>
+</html>

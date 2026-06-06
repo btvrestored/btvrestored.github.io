@@ -280,6 +280,36 @@
     .btn-send:hover { opacity: .9; }
     .btn-send:active { transform: scale(.98); }
     .btn-send:disabled { opacity: .4; cursor: not-allowed; }
+    .quick-templates {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .template-btn {
+      padding: 7px 9px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      text-align: left;
+      transition: color .15s, border-color .15s, background .15s;
+    }
+    .template-btn:hover { border-color: var(--accent); color: var(--text); background: rgba(79,158,255,.06); }
+    .send-preview {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px dashed var(--border);
+      border-radius: 5px;
+      background: rgba(0,0,0,.18);
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+      min-height: 42px;
+    }
 
     /* TOAST */
     #toast {
@@ -406,6 +436,7 @@
     }
     .filter-pill:hover { border-color: var(--muted); color: var(--text); }
     .filter-pill.active { border-color: var(--accent); color: var(--accent); background: rgba(79,158,255,.1); }
+    .filter-pill.danger.active { border-color: var(--danger); color: var(--danger); background: rgba(255,79,79,.1); }
     .tool-sep { flex: 1; }
     .btn-clear-all {
       padding: 4px 10px;
@@ -467,7 +498,7 @@
     /* responsive */
     .inbox-row {
       display: grid;
-      grid-template-columns: 1fr 80px 120px 90px;
+      grid-template-columns: 1fr 80px 120px 150px;
       gap: 12px;
       align-items: center;
       padding: 10px 18px;
@@ -477,6 +508,7 @@
     }
     .inbox-row:hover { background: rgba(255,255,255,.02); }
     .inbox-row.approved { opacity: .5; }
+    .inbox-row.rejected { opacity: .45; }
     .btn-approve {
       padding: 4px 10px;
       border-radius: 3px;
@@ -491,6 +523,44 @@
     }
     .btn-approve:hover { background: rgba(46,204,113,.15); }
     .btn-approve.done { opacity:.4; cursor:default; pointer-events:none; }
+    .btn-reject {
+      padding: 4px 10px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,79,79,.4);
+      cursor: pointer;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      background: none;
+      color: var(--danger);
+      transition: all .12s;
+    }
+    .btn-reject:hover { background: rgba(255,79,79,.15); }
+    .btn-repeat {
+      padding: 4px 10px;
+      border-radius: 3px;
+      border: 1px solid rgba(79,158,255,.4);
+      cursor: pointer;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      background: none;
+      color: var(--accent);
+      transition: all .12s;
+    }
+    .btn-repeat:hover { background: rgba(79,158,255,.15); }
+    .status-pill {
+      display: inline-block;
+      margin-top: 5px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .status-pending { border-color: rgba(79,158,255,.35); color: var(--accent); }
+    .status-approved { border-color: rgba(46,204,113,.35); color: #2ecc71; }
+    .status-rejected { border-color: rgba(255,79,79,.35); color: var(--danger); }
 
     @media (max-width: 900px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
@@ -577,11 +647,20 @@
           <div class="card-body">
             <div class="form-group">
               <label>Сообщение</label>
-              <textarea id="fMessage" placeholder="Введите текст…"></textarea>
+              <textarea id="fMessage" placeholder="Введите текст…" oninput="updateSendPreview()"></textarea>
             </div>
             <div class="form-group">
               <label>Имя пользователя</label>
-              <input id="fUser" type="text" placeholder="Необязательно">
+              <input id="fUser" type="text" placeholder="Необязательно" oninput="updateSendPreview()">
+            </div>
+            <div class="form-group">
+              <label>Быстрые шаблоны</label>
+              <div class="quick-templates">
+                <button class="template-btn" onclick="applyTemplate('Следующий клип уже готовится к эфиру.')">Следующий клип</button>
+                <button class="template-btn" onclick="applyTemplate('Спасибо за ваши сообщения, читаем всё в эфире.')">Спасибо зрителям</button>
+                <button class="template-btn" onclick="applyTemplate('Оставайтесь с BRIDGE TV Project Restored.')">Оставайтесь с нами</button>
+                <button class="template-btn" onclick="applyTemplate('Заказать клип можно через @bmprorder_bot.')">Заказать клип</button>
+              </div>
             </div>
             <div class="form-group">
               <label>Тип</label>
@@ -592,6 +671,7 @@
                 <button class="pill" data-type="express" onclick="selectType(this)">Express</button>
               </div>
             </div>
+            <div class="send-preview" id="sendPreview">Предпросмотр появится здесь.</div>
             <button class="btn-send" id="btnSend" onclick="sendMessage()">↑ ОТПРАВИТЬ</button>
           </div>
         </div>
@@ -647,10 +727,13 @@
           <button class="filter-pill"        data-f="vip"    onclick="setFilter(this)">VIP</button>
           <button class="filter-pill"        data-f="glamour" onclick="setFilter(this)">Glamour</button>
           <button class="filter-pill"        data-f="express" onclick="setFilter(this)">Express</button>
+          <button class="filter-pill active" data-role="all" onclick="setRoleFilter(this)">Все роли</button>
+          <button class="filter-pill"        data-role="viewer" onclick="setRoleFilter(this)">Только зрители</button>
+          <button class="filter-pill"        data-role="moderator" onclick="setRoleFilter(this)">Только модераторы</button>
           <div class="tool-sep"></div>
           <div class="search-wrap">
             <span class="search-ico">🔍</span>
-            <input id="searchInput" placeholder="Поиск…" oninput="renderLog()">
+            <input id="searchInput" placeholder="Поиск по тексту или имени…" oninput="renderLog()">
           </div>
           <button class="btn-clear-all" onclick="clearAll()">✕ Очистить всё</button>
         </div>
@@ -680,13 +763,14 @@
           <div class="tool-sep"></div>
           <button class="filter-pill active" data-if="pending" onclick="setInboxFilter(this)">Ожидают</button>
           <button class="filter-pill"        data-if="approved" onclick="setInboxFilter(this)">Одобрены</button>
+          <button class="filter-pill danger" data-if="rejected" onclick="setInboxFilter(this)">Отклонены</button>
           <button class="filter-pill"        data-if="all"     onclick="setInboxFilter(this)">Все</button>
           <div class="search-wrap">
             <span class="search-ico">🔍</span>
-            <input id="inboxSearch" placeholder="Поиск…" oninput="renderInbox()">
+            <input id="inboxSearch" placeholder="Поиск по имени…" oninput="renderInbox()">
           </div>
         </div>
-        <div class="log-header" style="grid-template-columns:1fr 80px 120px 90px">
+        <div class="log-header" style="grid-template-columns:1fr 80px 120px 150px">
           <span>Сообщение / Имя</span>
           <span>Тип</span>
           <span style="text-align:right">Время</span>
@@ -795,6 +879,7 @@
   let inboxMessages = {}; // key → {message, user, smsType, ts, approved, senderRole}
   let selectedType = 'normal';
   let filterType   = 'all';
+  let roleFilter   = 'all';
   let inboxFilter  = 'pending';
 
   const auth = firebase.auth();
@@ -854,6 +939,7 @@
           smsType:  d.smsType  || 'normal',
           ts:       d.ts       || 0,
           approved: d.approved || false,
+          status:   d.status || (d.approved ? 'approved' : 'pending'),
           source:   d.source   || d.senderRole || 'viewer',
           senderRole: d.senderRole || d.source || 'viewer'
         };
@@ -886,6 +972,23 @@
     });
     selectedType = el.dataset.type;
     el.classList.add('sel-' + selectedType);
+    updateSendPreview();
+  }
+
+  function applyTemplate(text) {
+    document.getElementById('fMessage').value = text;
+    if (!document.getElementById('fUser').value.trim()) {
+      document.getElementById('fUser').value = 'BTV';
+    }
+    updateSendPreview();
+  }
+
+  function updateSendPreview() {
+    const el = document.getElementById('sendPreview');
+    if (!el) return;
+    const message = document.getElementById('fMessage').value.trim();
+    const user = document.getElementById('fUser').value.trim() || 'BTV';
+    el.textContent = message ? `Модератор канала (${user}): ${message}` : 'Предпросмотр появится здесь.';
   }
 
   /* ── Send ── */
@@ -908,6 +1011,7 @@
     }).then(() => {
       document.getElementById('fMessage').value = '';
       document.getElementById('fUser').value    = '';
+      updateSendPreview();
       showToast('✓ Сообщение отправлено');
       btn.disabled = false;
     }).catch(err => {
@@ -918,9 +1022,16 @@
 
   /* ── Filter ── */
   function setFilter(el) {
-    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('[data-f]').forEach(p => p.classList.remove('active'));
     el.classList.add('active');
     filterType = el.dataset.f;
+    renderLog();
+  }
+
+  function setRoleFilter(el) {
+    document.querySelectorAll('[data-role]').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    roleFilter = el.dataset.role;
     renderLog();
   }
 
@@ -932,9 +1043,11 @@
 
     const entries = Object.entries(allMessages)
       .filter(([,m]) => filterType === 'all' || m.smsType === filterType)
+      .filter(([,m]) => roleFilter === 'all' || messageRole(m) === roleFilter)
       .filter(([,m]) => !search ||
         m.message.toLowerCase().includes(search) ||
-        m.user.toLowerCase().includes(search))
+        m.user.toLowerCase().includes(search) ||
+        (m.displayName || '').toLowerCase().includes(search))
       .sort(([,a],[,b]) => (b.ts||0) - (a.ts||0));
 
     if (entries.length === 0) {
@@ -990,7 +1103,7 @@
 
   /* ── Inbox badge ── */
   function updateInboxBadge() {
-    const pending = Object.values(inboxMessages).filter(m => !m.approved).length;
+    const pending = Object.values(inboxMessages).filter(m => messageStatus(m) === 'pending').length;
     const b = document.getElementById('badgeInbox');
     b.textContent = pending;
     b.classList.toggle('visible', pending > 0);
@@ -1014,13 +1127,16 @@
 
     const entries = Object.entries(inboxMessages)
       .filter(([,m]) => {
-        if (inboxFilter === 'pending')  return !m.approved;
-        if (inboxFilter === 'approved') return  m.approved;
+        const status = messageStatus(m);
+        if (inboxFilter === 'pending')  return status === 'pending';
+        if (inboxFilter === 'approved') return status === 'approved';
+        if (inboxFilter === 'rejected') return status === 'rejected';
         return true;
       })
       .filter(([,m]) => !search ||
         m.message.toLowerCase().includes(search) ||
-        m.user.toLowerCase().includes(search))
+        m.user.toLowerCase().includes(search) ||
+        (m.displayName || '').toLowerCase().includes(search))
       .sort(([,a],[,b]) => (b.ts||0) - (a.ts||0));
 
     if (entries.length === 0) {
@@ -1031,16 +1147,20 @@
     }
 
     container.innerHTML = entries.map(([key, m]) => `
-      <div class="inbox-row ${m.approved ? 'approved' : ''}" id="inbox-${key}">
+      <div class="inbox-row ${messageStatus(m)}" id="inbox-${key}">
         <div>
           <div class="msg-text">${esc(m.message)}</div>
           <div class="msg-user">${messageMeta(m)}</div>
+          <span class="status-pill status-${messageStatus(m)}">${statusLabel(m)}</span>
         </div>
         <div><span class="tag tag-${m.smsType}">${m.smsType}</span></div>
         <div class="msg-time">${fmtTime(m.ts)}</div>
         <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
-          <button class="btn-approve ${m.approved ? 'done' : ''}"
-            onclick="approveInbox('${key}')" title="Отправить на экран">▶ Показать</button>
+          ${messageStatus(m) === 'pending' ? `
+            <button class="btn-approve" onclick="approveInbox('${key}')" title="Отправить на экран">▶ Показать</button>
+            <button class="btn-reject" onclick="rejectInbox('${key}')" title="Отклонить">Отклонить</button>
+          ` : ''}
+          ${messageStatus(m) === 'approved' ? `<button class="btn-repeat" onclick="repeatInbox('${key}')" title="Повторить в эфир">↻ Повторить</button>` : ''}
           <button class="del-btn" onclick="deleteInbox('${key}')" title="Удалить">✕</button>
         </div>
       </div>
@@ -1051,7 +1171,7 @@
   function approveInbox(key) {
     const m = inboxMessages[key];
     if (!m) return;
-    if (m.approved) return;
+    if (messageStatus(m) === 'approved') return;
     db.ref('messages').push({
       message: m.message,
       user: m.user,
@@ -1062,8 +1182,34 @@
       ts: Date.now(),
       inboxKey: key
     })
-      .then(() => db.ref('inbox/' + key + '/approved').set(true))
+      .then(() => db.ref('inbox/' + key).update({ approved: true, status: 'approved', approvedAt: Date.now() }))
       .then(() => showToast('✓ Отправлено на экран'))
+      .catch(err => showToast('✕ ' + err.message));
+  }
+
+  function rejectInbox(key) {
+    const m = inboxMessages[key];
+    if (!m) return;
+    db.ref('inbox/' + key).update({ approved: false, status: 'rejected', rejectedAt: Date.now() })
+      .then(() => showToast('✓ Отклонено'))
+      .catch(err => showToast('✕ ' + err.message));
+  }
+
+  function repeatInbox(key) {
+    const m = inboxMessages[key];
+    if (!m || messageStatus(m) !== 'approved') return;
+    db.ref('messages').push({
+      message: m.message,
+      user: m.user,
+      displayName: m.displayName || m.user || '',
+      smsType: m.smsType,
+      source: m.source || 'viewer',
+      senderRole: m.senderRole || m.source || 'viewer',
+      ts: Date.now(),
+      inboxKey: key,
+      repeated: true
+    })
+      .then(() => showToast('✓ Повторено в эфир'))
       .catch(err => showToast('✕ ' + err.message));
   }
 
@@ -1091,6 +1237,20 @@
   /* ── Helpers ── */
   function messageRole(m) {
     return (m.senderRole || m.source) === 'viewer' ? 'viewer' : 'moderator';
+  }
+
+  function messageStatus(m) {
+    if (m.status) return m.status;
+    return m.approved ? 'approved' : 'pending';
+  }
+
+  function statusLabel(m) {
+    const labels = {
+      pending: 'ожидает модерации',
+      approved: 'одобрено',
+      rejected: 'отклонено'
+    };
+    return labels[messageStatus(m)] || labels.pending;
   }
 
   function messageMeta(m) {

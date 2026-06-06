@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Заказать клип - BRIDGE TV Project Restored</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&subset=cyrillic,latin&display=swap" rel="stylesheet">
+  <style>
+    :root{--black:#070707;--orange:#ff6a00;--blue:#235fa8;--line:#e6e6e6}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Roboto,Arial,sans-serif;background:linear-gradient(180deg,#fbfbfb,#d8d8d8);color:#222}
+    a{color:inherit;text-decoration:none}
+    .page{width:min(900px,calc(100% - 24px));margin:14px auto 24px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.06)}
+    header{background:var(--black);padding:18px 22px}
+    .logo img{height:48px}
+    nav{display:flex;justify-content:center;gap:32px;padding:16px 14px 15px;border-bottom:1px solid #ededed;font-size:16px;flex-wrap:wrap}
+    nav a.active{color:var(--orange);font-weight:700}
+    main{padding:34px 28px 42px}
+    h1{margin:0 0 10px;font-size:32px;font-weight:900;letter-spacing:-.5px}
+    p{line-height:1.5;color:#555}
+    .panel{margin-top:22px;border:1px solid var(--line);border-radius:6px;padding:22px;background:#f8f8f8}
+    .bot{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+    .avatar{width:58px;height:58px;border-radius:8px;background:linear-gradient(135deg,#2aabee,#1f7fc0);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:24px}
+    .name{font-weight:900;font-size:20px}
+    .hint{color:#777;font-size:14px;margin-top:4px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+    .btn{display:inline-block;border-radius:4px;padding:11px 16px;font-weight:700}
+    .primary{background:var(--orange);color:#fff;box-shadow:0 2px 0 rgba(0,0,0,.16)}
+    .secondary{border:1px solid var(--line);color:var(--blue);background:#fff}
+    .rules{margin-top:22px}
+    .rules li{margin:7px 0;color:#555}
+    footer{padding:16px 18px 22px;color:#777;font-size:13px;border-top:1px solid #eee}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header><a class="logo" href="index.html"><img src="logo.png" alt="BRIDGE TV"></a></header>
+    <nav>
+      <a href="shows.html">Программы</a>
+      <a href="top10.html">Top 10</a>
+      <a href="identity.html">Архив</a>
+      <a href="about.html">О телеканале</a>
+      <a class="active" href="order.html">Заказать клип</a>
+    </nav>
+    <main>
+      <h1>Заказать клип или предложить трек</h1>
+      <p>Для музыкальных заявок используйте Telegram-бота BM-PR. Так запрос не потеряется и его проще обработать перед эфиром.</p>
+      <section class="panel">
+        <div class="bot">
+          <div class="avatar">TG</div>
+          <div>
+            <div class="name">@bmprorder_bot</div>
+            <div class="hint">бот для заказов клипов и предложений треков</div>
+          </div>
+        </div>
+        <div class="actions">
+          <a class="btn primary" href="https://t.me/bmprorder_bot" target="_blank" rel="noopener">Открыть в Telegram</a>
+          <a class="btn secondary" href="https://web.telegram.org/k/#@bmprorder_bot" target="_blank" rel="noopener">Открыть в Telegram Web</a>
+        </div>
+        <ul class="rules">
+          <li>Укажите исполнителя и название трека.</li>
+          <li>Если есть ссылка на клип, приложите её.</li>
+          <li>Заявка не гарантирует мгновенный показ, но помогает собрать ротацию.</li>
+        </ul>
+      </section>
+    </main>
+    <footer>Presented by BM-PR. Not affiated with BRIDGE MEDIA.</footer>
+  </div>
+</body>
+</html>
