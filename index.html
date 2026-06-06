@@ -245,11 +245,65 @@
       background:#000;
     }
     .video-fallback{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
       margin-top:8px;
+      padding:10px 14px;
+      background:var(--orange);
+      border-radius:4px;
       font-size:13px;
-      color:var(--blue);
-      text-decoration:underline;
+      color:#fff;
+      text-decoration:none;
       font-weight:700;
+      box-shadow:0 2px 0 rgba(0,0,0,.16);
+    }
+    .video-note{
+      display:inline-block;
+      margin-left:10px;
+      font-size:12px;
+      color:#777;
+    }
+    .msg-preview{
+      margin-top:12px;
+      padding:10px 12px;
+      background:#fff;
+      border:1px dashed #d2d2d2;
+      border-radius:4px;
+      color:#333;
+      font-size:13px;
+      min-height:38px;
+    }
+    .request-status{
+      margin-top:10px;
+      padding:9px 11px;
+      border-radius:4px;
+      background:#fff;
+      border:1px solid #e2e2e2;
+      color:#666;
+      font-size:13px;
+      display:none;
+    }
+    .request-status.visible{display:block}
+    .history-today{
+      padding:18px 18px 0;
+    }
+    .history-card{
+      background:#111;
+      color:#fff;
+      border-radius:6px;
+      padding:16px 18px;
+      border-left:6px solid var(--orange);
+    }
+    .history-card h2{
+      margin:0 0 8px;
+      font-size:20px;
+      color:#fff;
+    }
+    .history-card p{
+      margin:0;
+      line-height:1.45;
+      color:#e5e5e5;
     }
     @media (max-width: 860px){
       header{flex-direction:column; align-items:flex-start}
@@ -280,9 +334,10 @@
 
     <nav>
       <a href="shows.html" data-i18n="nav_shows">Shows</a>
-      <a href="#" data-i18n="nav_schedule">Schedule</a>
+      <a href="top10.html" data-i18n="nav_top10">Top 10</a>
+      <a href="identity.html" data-i18n="nav_identity">Archive</a>
       <a href="about.html" data-i18n="nav_about">About</a>
-      <a href="#" data-i18n="nav_contact">Contact</a>
+      <a href="order.html" data-i18n="nav_order">Order clip</a>
     </nav>
 
     <section style="padding:18px 18px 0">
@@ -298,6 +353,7 @@
         </iframe>
       </div>
       <a class="video-fallback" href="https://live.vkvideo.ru/btvrestored" target="_blank" rel="noopener" data-i18n="video_fallback">Open live video</a>
+      <span class="video-note" data-i18n="video_note">If the player is blocked, use this direct link.</span>
     </section>
 
     <!-- Viewer message form -->
@@ -349,11 +405,18 @@
           </div>
         </div>
 
+        <div class="msg-preview" id="msgPreview" data-i18n="msg_preview_empty">Preview will appear here.</div>
         <div id="msgFeedback" style="margin-top:10px;font-size:13px;min-height:18px;"></div>
+        <div class="request-status" id="requestStatus"></div>
       </div>
     </section>
 
-
+    <section class="history-today">
+      <div class="history-card">
+        <h2 data-i18n="history_title">Today in BRIDGE TV history</h2>
+        <p id="historyText">BRIDGE TV launched on June 1, 2005 and built its own alternative music universe around shows, SMS chat and rare music videos.</p>
+      </div>
+    </section>
 
 
     <footer>
@@ -378,8 +441,11 @@
     const VIEWER_COOLDOWN_MS = 30000;
     const VIEWER_COOLDOWN_KEY = 'btv_viewer_last_sent_at';
     const VIEWER_NAME_KEY = 'btv_viewer_name';
+    const VIEWER_REQUEST_KEY = 'btv_viewer_last_request_key';
+    const BAD_WORDS = ['хуй', 'пизд', 'еба', 'ебл', 'бля', 'сука', 'fuck', 'shit'];
     let lastSent = Number(localStorage.getItem(VIEWER_COOLDOWN_KEY) || 0);
     let cooldownTimer = null;
+    let requestStatusRef = null;
     let curLang = 'en';
 
     function submitMsg() {
@@ -389,6 +455,8 @@
 
       if (!text) { showFb('\u26a0 ' + (curLang==='ru' ? '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435' : 'Please enter a message'), '#e46500'); return; }
       if (!user) { showFb('\u26a0 ' + (curLang==='ru' ? '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0438\u043c\u044f' : 'Please enter your name'), '#e46500'); return; }
+      const validationError = validateViewerMessage(text, user);
+      if (validationError) { showFb('\u26a0 ' + validationError, '#e46500'); return; }
 
       const remaining = getCooldownRemaining();
       if (remaining > 0) {
@@ -399,7 +467,8 @@
 
       const btn = document.getElementById('msgBtn');
       btn.disabled = true;
-      db.ref('inbox').push({
+      const inboxRef = db.ref('inbox').push();
+      inboxRef.set({
         message: text,
         user: user,
         displayName: user,
@@ -408,13 +477,17 @@
         senderRole: 'viewer',
         cooldownMs: VIEWER_COOLDOWN_MS,
         ts: Date.now(),
-        approved: false
+        approved: false,
+        status: 'pending'
       })
         .then(() => {
           lastSent = Date.now();
           localStorage.setItem(VIEWER_COOLDOWN_KEY, String(lastSent));
           localStorage.setItem(VIEWER_NAME_KEY, user);
+          localStorage.setItem(VIEWER_REQUEST_KEY, inboxRef.key);
           document.getElementById('msgText').value = '';
+          updatePreview();
+          watchRequestStatus(inboxRef.key);
           showFb('\u2713 ' + (curLang==='ru' ? '\u0421\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435 \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043e!' : 'Message sent!'), '#2a9a2a');
           updateCooldownButton();
         })
@@ -437,8 +510,67 @@
       document.getElementById('msgUser').addEventListener('keydown', function(e) {
         if (e.key === 'Enter') submitMsg();
       });
+      document.getElementById('msgText').addEventListener('input', updatePreview);
+      document.getElementById('msgUser').addEventListener('input', updatePreview);
+      document.getElementById('msgType').addEventListener('change', updatePreview);
+      updatePreview();
+      renderTodayHistory();
+      watchRequestStatus(localStorage.getItem(VIEWER_REQUEST_KEY));
       updateCooldownButton();
     });
+
+    function validateViewerMessage(text, user) {
+      const normalized = (text + ' ' + user).toLowerCase();
+      if (BAD_WORDS.some(function(word) { return normalized.includes(word); })) {
+        return curLang === 'ru' ? '\u0411\u0435\u0437 \u043c\u0430\u0442\u0430, \u043f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430' : 'Please keep it clean';
+      }
+      if (/(.)\1{7,}/i.test(text.replace(/\s+/g, ''))) {
+        return curLang === 'ru' ? '\u0421\u043b\u0438\u0448\u043a\u043e\u043c \u043c\u043d\u043e\u0433\u043e \u043f\u043e\u0432\u0442\u043e\u0440\u043e\u0432' : 'Too many repeated characters';
+      }
+      return '';
+    }
+
+    function updatePreview() {
+      const box = document.getElementById('msgPreview');
+      if (!box) return;
+      const text = document.getElementById('msgText').value.trim();
+      const user = document.getElementById('msgUser').value.trim();
+      box.textContent = text
+        ? (user || (curLang === 'ru' ? '\u0417\u0440\u0438\u0442\u0435\u043b\u044c' : 'Viewer')) + ': ' + text
+        : i18n[curLang].msg_preview_empty;
+    }
+
+    function watchRequestStatus(key) {
+      const box = document.getElementById('requestStatus');
+      if (!box || !key) return;
+      if (requestStatusRef) requestStatusRef.off();
+      requestStatusRef = db.ref('inbox/' + key);
+      requestStatusRef.on('value', function(snap) {
+        const data = snap.val();
+        if (!data) {
+          box.classList.remove('visible');
+          return;
+        }
+        const status = data.status || (data.approved ? 'approved' : 'pending');
+        const labels = {
+          pending: curLang === 'ru' ? '\u041e\u0436\u0438\u0434\u0430\u0435\u0442 \u043c\u043e\u0434\u0435\u0440\u0430\u0446\u0438\u0438' : 'Waiting for moderation',
+          approved: curLang === 'ru' ? '\u041e\u0434\u043e\u0431\u0440\u0435\u043d\u043e' : 'Approved',
+          rejected: curLang === 'ru' ? '\u041e\u0442\u043a\u043b\u043e\u043d\u0435\u043d\u043e' : 'Rejected'
+        };
+        box.textContent = (curLang === 'ru' ? '\u0421\u0442\u0430\u0442\u0443\u0441 \u0437\u0430\u044f\u0432\u043a\u0438: ' : 'Request status: ') + (labels[status] || labels.pending);
+        box.classList.add('visible');
+      });
+    }
+
+    function renderTodayHistory() {
+      const items = [
+        '\u0412 2005 \u0433\u043e\u0434\u0443 BRIDGE TV \u0432\u044b\u0448\u0435\u043b \u0432 \u044d\u0444\u0438\u0440 \u0438 \u0441\u0442\u0430\u043b \u0430\u043b\u044c\u0442\u0435\u0440\u043d\u0430\u0442\u0438\u0432\u043e\u0439 \u0434\u043b\u044f \u043c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0445 \u043a\u0430\u043d\u0430\u043b\u043e\u0432 \u0442\u043e\u0433\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438.',
+        '\u0412 \u044d\u0444\u0438\u0440\u0435 BRIDGE TV \u0440\u0430\u043d\u044c\u0448\u0435 \u0436\u0438\u043b\u0438 SMS-\u0447\u0430\u0442, \u0437\u0430\u043a\u0430\u0437\u044b \u043a\u043b\u0438\u043f\u043e\u0432 \u0438 \u0444\u0438\u0440\u043c\u0435\u043d\u043d\u044b\u0435 \u043d\u043e\u0447\u043d\u044b\u0435 \u0431\u043b\u043e\u043a\u0438.',
+        'Bridge in Time, Baby Time, Rock Party Time \u0438 Top 10 \u0441\u043e\u0431\u0438\u0440\u0430\u043b\u0438 \u0432\u043e\u043a\u0440\u0443\u0433 \u043a\u0430\u043d\u0430\u043b\u0430 \u0436\u0438\u0432\u0443\u044e \u0430\u0443\u0434\u0438\u0442\u043e\u0440\u0438\u044e.'
+      ];
+      const el = document.getElementById('historyText');
+      if (el) el.textContent = items[new Date().getDate() % items.length];
+    }
 
     function getCooldownRemaining() {
       return Math.max(0, VIEWER_COOLDOWN_MS - (Date.now() - lastSent));
@@ -476,31 +608,39 @@
     var i18n = {
       en: {
         nav_shows:           'Shows',
-        nav_schedule:        'Schedule',
+        nav_top10:           'Top 10',
+        nav_identity:        'Archive',
         nav_about:           'About',
-        nav_contact:         'Contact',
+        nav_order:           'Order clip',
         footer:              'Presented by BM-PR. Not affiated with BRIDGE MEDIA.',
+        history_title:       'Today in BRIDGE TV history',
         msg_title:           'Write on screen',
         msg_label_text:      'Message',
         msg_label_name:      'Name',
         msg_label_type:      'Type',
         msg_send:            'Send',
         video_fallback:      'Open live video',
+        video_note:          'If the player is blocked, use this direct link.',
+        msg_preview_empty:   'Preview will appear here.',
         msg_placeholder:     'Your message\u2026',
         msg_placeholder_name:'Your name'
       },
       ru: {
         nav_shows:           '\u041f\u0440\u043e\u0433\u0440\u0430\u043c\u043c\u044b',
-        nav_schedule:        '\u0422\u0435\u043b\u0435\u043f\u0440\u043e\u0433\u0440\u0430\u043c\u043c\u0430',
+        nav_top10:           'Top 10',
+        nav_identity:        '\u0410\u0440\u0445\u0438\u0432',
         nav_about:           '\u041e \u0442\u0435\u043b\u0435\u043a\u0430\u043d\u0430\u043b\u0435',
-        nav_contact:         '\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u044b',
+        nav_order:           '\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u043a\u043b\u0438\u043f',
         footer:              '\u041f\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u043e \u043a\u043e\u043c\u0430\u043d\u0434\u043e\u0439 BM-PR.',
+        history_title:       '\u0421\u0435\u0433\u043e\u0434\u043d\u044f \u0432 \u0438\u0441\u0442\u043e\u0440\u0438\u0438 BRIDGE TV',
         msg_title:           '\u041d\u0430\u043f\u0438\u0441\u0430\u0442\u044c \u043d\u0430 \u044d\u043a\u0440\u0430\u043d',
         msg_label_text:      '\u0421\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435',
         msg_label_name:      '\u0418\u043c\u044f',
         msg_label_type:      '\u0422\u0438\u043f',
         msg_send:            '\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c',
         video_fallback:      '\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u044d\u0444\u0438\u0440',
+        video_note:          '\u0415\u0441\u043b\u0438 \u043f\u043b\u0435\u0435\u0440 \u043d\u0435 \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u043b\u0441\u044f, \u043e\u0442\u043a\u0440\u043e\u0439\u0442\u0435 \u044d\u0444\u0438\u0440 \u043f\u043e \u0441\u0441\u044b\u043b\u043a\u0435.',
+        msg_preview_empty:   '\u041f\u0440\u0435\u0434\u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440 \u043f\u043e\u044f\u0432\u0438\u0442\u0441\u044f \u0437\u0434\u0435\u0441\u044c.',
         msg_placeholder:     '\u0412\u0430\u0448\u0435 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435\u2026',
         msg_placeholder_name:'\u0412\u0430\u0448\u0435 \u0438\u043c\u044f'
       }
@@ -521,6 +661,8 @@
         btn.classList.toggle('active', btn.getAttribute('onclick').includes("'" + lang + "'"));
       });
       localStorage.setItem('lang', lang);
+      updatePreview();
+      watchRequestStatus(localStorage.getItem(VIEWER_REQUEST_KEY));
       updateCooldownButton();
     }
 
