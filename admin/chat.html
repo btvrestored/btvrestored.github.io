@@ -64,6 +64,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics-compat.js"></script>
 
 <script>
   const firebaseConfig = {
@@ -77,6 +78,7 @@
   };
 
   firebase.initializeApp(firebaseConfig);
+  const analytics = firebase.analytics();
   const db = firebase.database();
 
   const wrapper = document.getElementById('ticker-wrapper');

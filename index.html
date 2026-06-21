@@ -427,6 +427,7 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics-compat.js"></script>
   <script>
     firebase.initializeApp({
       apiKey:            "AIzaSyBF2P0A7uYJtCLYxOnKynMxPjkmpoJax9g",
@@ -437,6 +438,7 @@
       appId: "1:20099218532:web:a982d36059aacecba77371",
       measurementId: "G-5Q6D5MNVFC"
     });
+    const analytics = firebase.analytics();
     const db = firebase.database();
     const VIEWER_COOLDOWN_MS = 30000;
     const VIEWER_COOLDOWN_KEY = 'btv_viewer_last_sent_at';
