@@ -1,0 +1,24 @@
+{
+  "rules": {
+    "admins": {
+      ".read": false,
+      ".write": false
+    },
+    "messages": {
+      ".read": true,
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      "$msgId": {
+        ".validate": "newData.hasChildren(['message', 'smsType', 'ts']) && newData.child('message').isString() && newData.child('message').val().length > 0 && newData.child('message').val().length <= 200 && newData.child('smsType').val().matches(/^(normal|vip|glamour|express)$/) && newData.child('ts').isNumber() && (!newData.child('user').exists() || (newData.child('user').isString() && newData.child('user').val().length <= 32)) && (!newData.child('displayName').exists() || (newData.child('displayName').isString() && newData.child('displayName').val().length <= 32)) && (!newData.child('source').exists() || newData.child('source').val().matches(/^(viewer|moderator)$/)) && (!newData.child('senderRole').exists() || newData.child('senderRole').val().matches(/^(viewer|moderator)$/))"
+      }
+    },
+    "inbox": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      "$msgId": {
+        ".read": true,
+        ".write": "(auth != null && root.child('admins').child(auth.uid).val() === true) || (!data.exists() && newData.child('message').isString() && newData.child('message').val().length > 0 && newData.child('message').val().length <= 200 && newData.child('user').isString() && newData.child('user').val().length > 0 && newData.child('user').val().length <= 32 && newData.child('displayName').isString() && newData.child('displayName').val().length > 0 && newData.child('displayName').val().length <= 32 && newData.child('smsType').val().matches(/^(normal|vip|glamour|express)$/) && newData.child('source').val() === 'viewer' && newData.child('senderRole').val() === 'viewer' && newData.child('approved').val() === false && newData.child('status').val() === 'pending' && newData.child('ts').isNumber())",
+        ".validate": "newData.hasChildren(['message', 'user', 'displayName', 'smsType', 'source', 'senderRole', 'ts', 'approved', 'status'])"
+      }
+    }
+  }
+}
