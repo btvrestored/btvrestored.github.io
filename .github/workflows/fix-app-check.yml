@@ -31,7 +31,7 @@ jobs:
               Path('admin/receive.html'),
           ]
           appcheck_script = '<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-check-compat.js"></script>'
-          appcheck_init = f"\\n  const appCheck = firebase.appCheck();\\n  appCheck.activate('{site_key}', true);\\n"
+          appcheck_init = f"\n  const appCheck = firebase.appCheck();\n  appCheck.activate('{site_key}', true);\n"
 
           def find_matching_paren(text, opening):
               depth = 0
@@ -42,12 +42,12 @@ jobs:
                   if quote:
                       if escape:
                           escape = False
-                      elif ch == '\\\\':
+                      elif ch == '\\':
                           escape = True
                       elif ch == quote:
                           quote = None
                       continue
-                  if ch in ('\"', "'", '`'):
+                  if ch in ('"', "'", '`'):
                       quote = ch
                   elif ch == '(':
                       depth += 1
@@ -60,36 +60,29 @@ jobs:
           def add_appcheck(text, path):
               original = text
 
-              # Load the compat App Check SDK once, immediately after firebase-app-compat.
               if 'firebase-app-check-compat.js' not in text:
                   app_marker = re.search(
-                      r'<script[^>]+src=[\"\']https://www\\.gstatic\\.com/firebasejs/[^\"\']+/firebase-app-compat\\.js[\"\'][^>]*></script>',
+                      r'<script[^>]+src=["\']https://www\.gstatic\.com/firebasejs/[^"\']+/firebase-app-compat\.js["\'][^>]*></script>',
                       text,
                       re.I,
                   )
                   if not app_marker:
                       raise SystemExit(f'Firebase app compat SDK marker not found in {path}')
-                  text = text[:app_marker.end()] + '\\n' + appcheck_script + text[app_marker.end():]
+                  text = text[:app_marker.end()] + '\n' + appcheck_script + text[app_marker.end():]
 
-              # Insert initialization after the actual firebase.initializeApp(...) call.
               if 'appCheck.activate(' not in text:
-                  init_match = re.search(r'firebase\\.initializeApp\\s*\\(', text)
-                  if init_match:
-                      end = find_matching_paren(text, text.find('(', init_match.start()))
-                      if end is None:
-                          raise SystemExit(f'Could not find end of firebase.initializeApp(...) in {path}')
-                      insert_at = end + 1
-                  else:
-                      # Some pages may use the modular initializeApp(...) API instead of compat.
-                      init_match = re.search(r'(?<![\\w$.])initializeApp\\s*\\(', text)
-                      if not init_match:
-                          raise SystemExit(f'Firebase initialization call not found in {path}')
-                      end = find_matching_paren(text, text.find('(', init_match.start()))
-                      if end is None:
-                          raise SystemExit(f'Could not find end of initializeApp(...) in {path}')
-                      insert_at = end + 1
+                  init_match = re.search(r'firebase\.initializeApp\s*\(', text)
+                  if not init_match:
+                      init_match = re.search(r'(?<![\w$.])initializeApp\s*\(', text)
+                  if not init_match:
+                      raise SystemExit(f'Firebase initialization call not found in {path}')
 
-                  text = text[:insert_at] + appcheck_init + text[insert_at:]
+                  opening = text.find('(', init_match.start())
+                  end = find_matching_paren(text, opening)
+                  if end is None:
+                      raise SystemExit(f'Could not find end of Firebase initialization call in {path}')
+
+                  text = text[:end + 1] + appcheck_init + text[end + 1:]
 
               return text, text != original
 
