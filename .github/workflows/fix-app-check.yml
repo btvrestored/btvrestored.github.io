@@ -15,15 +15,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Add Firebase App Check to web pages
-        env:
-          SITE_KEY: 6Letro4tAAAAAO_hk7XQrWX0OG6GjPARsB2U0uwJ
+      - name: Add Firebase App Check to compat web pages
         run: |
           python3 - <<'PY'
           from pathlib import Path
 
           site_key = '6Letro4tAAAAAO_hk7XQrWX0OG6GjPARsB2U0uwJ'
-          files = [Path('index.html'), Path('admin/index.html'), Path('admin/chat.html'), Path('admin/receive.html')]
+          # These pages use the Firebase compat SDK. index.html currently uses a
+          # different Firebase initialization pattern, so do not inject compat
+          # App Check code into it automatically.
+          files = [
+              Path('admin/index.html'),
+              Path('admin/chat.html'),
+              Path('admin/receive.html'),
+          ]
           appcheck_script = '<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-check-compat.js"></script>'
           appcheck_init = f"""\n  const appCheck = firebase.appCheck();\n  appCheck.activate('{site_key}', true);\n"""
 
@@ -31,6 +36,7 @@ jobs:
           for path in files:
               text = path.read_text(encoding='utf-8')
               original = text
+
               if 'firebase-app-check-compat.js' not in text:
                   marker = '<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>'
                   if marker in text:
@@ -38,7 +44,7 @@ jobs:
                   else:
                       marker = '<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>'
                       if marker not in text:
-                          raise SystemExit(f'Firebase app SDK marker not found in {path}')
+                          raise SystemExit(f'Firebase compat SDK marker not found in {path}')
                       text = text.replace(marker, marker + '\n' + appcheck_script, 1)
 
               if 'appCheck.activate(' not in text:
@@ -58,7 +64,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html admin/index.html admin/chat.html admin/receive.html .github/workflows/fix-app-check.yml
+          git add admin/index.html admin/chat.html admin/receive.html .github/workflows/fix-app-check.yml
           git rm .github/workflows/fix-app-check.yml
-          git commit -m "fix: initialize Firebase App Check on web pages"
+          git commit -m "fix: initialize Firebase App Check on admin pages"
           git push
