@@ -858,6 +858,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-check-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics-compat.js"></script>
 
 <script>
@@ -873,6 +874,9 @@
     measurementId: "G-5Q6D5MNVFC"
   };
   firebase.initializeApp(firebaseConfig);
+  const appCheck = firebase.appCheck();
+  appCheck.activate('6Letro4tAAAAAO_hk7XQrWX0OG6GjPARsB2U0uwJ', true);
+
   const analytics = firebase.analytics();
   const db = firebase.database();
 
