@@ -717,7 +717,7 @@
     <div id="page-log" style="display:none;">
       <div>
         <div class="page-title">Лог сообщений</div>
-        <div class="page-subtitle">Все входящие сообщения из Firebase Realtime Database</div>
+        <div class="page-subtitle">Все входящие сообщения из Supabase (Postgres)</div>
       </div>
 
       <div class="card">
@@ -854,32 +854,11 @@
 
 <div id="toast"></div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-check-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics-compat.js"></script>
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
 
 <script>
-  /* ── Firebase init ── */
-  const firebaseConfig = {
-    apiKey: "AIzaSyBF2P0A7uYJtCLYxOnKynMxPjkmpoJax9g",
-    authDomain: "btvrestored.firebaseapp.com",
-    projectId: "btvrestored",
-    databaseURL: "https://btvrestored-default-rtdb.europe-west1.firebasedatabase.app",
-    storageBucket: "btvrestored.firebasestorage.app",
-    messagingSenderId: "20099218532",
-    appId: "1:20099218532:web:a982d36059aacecba77371",
-    measurementId: "G-5Q6D5MNVFC"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const appCheck = firebase.appCheck();
-  appCheck.activate('6Letro4tAAAAAO_hk7XQrWX0OG6GjPARsB2U0uwJ', true);
-
-  const analytics = firebase.analytics();
-  const db = firebase.database();
-
   /* ── State ── */
   let allMessages = {};   // key → {message, user, smsType, ts, senderRole}
   let inboxMessages = {}; // key → {message, user, smsType, ts, approved, senderRole}
@@ -888,10 +867,8 @@
   let roleFilter   = 'all';
   let inboxFilter  = 'pending';
 
-  const auth = firebase.auth();
-
   /* ── Auth gate ── */
-  auth.onAuthStateChanged(user => {
+  btv.onAuthChange(user => {
     if (user) {
       document.getElementById('loginOverlay').style.display = 'none';
       document.getElementById('shell').style.display = 'grid';
@@ -905,28 +882,16 @@
 
   function startListeners() {
     /* ── Connection indicator ── */
-    db.ref('.info/connected').on('value', snap => {
-      const ok = snap.val();
+    btv.watchConnection(ok => {
       document.getElementById('connDot').style.background   = ok ? '#2ecc71' : '#e74c3c';
       document.getElementById('connDot').style.boxShadow    = ok ? '0 0 6px #2ecc71' : '0 0 6px #e74c3c';
       document.getElementById('connLabel').textContent       = ok ? 'подключено' : 'нет соединения';
     });
 
     /* ── Listen all messages ── */
-    db.ref('messages').on('value', snap => {
+    btv.subscribeMessages(rows => {
       allMessages = {};
-      snap.forEach(child => {
-        const d = child.val() || {};
-        allMessages[child.key] = {
-          message: d.message || '',
-          user:    d.user    || '',
-          displayName: d.displayName || d.user || '',
-          smsType: d.smsType || 'normal',
-          ts:      d.ts      || 0,
-          source:  d.source  || d.senderRole || 'moderator',
-          senderRole: d.senderRole || d.source || 'moderator'
-        };
-      });
+      rows.forEach(m => { allMessages[m.key] = m; });
       updateStats();
       renderLog();
       renderPreview5();
@@ -934,22 +899,9 @@
     });
 
     /* ── Listen inbox ── */
-    db.ref('inbox').on('value', snap => {
+    btv.subscribeInbox(rows => {
       inboxMessages = {};
-      snap.forEach(child => {
-        const d = child.val() || {};
-        inboxMessages[child.key] = {
-          message:  d.message  || '',
-          user:     d.user     || '',
-          displayName: d.displayName || d.user || '',
-          smsType:  d.smsType  || 'normal',
-          ts:       d.ts       || 0,
-          approved: d.approved || false,
-          status:   d.status || (d.approved ? 'approved' : 'pending'),
-          source:   d.source   || d.senderRole || 'viewer',
-          senderRole: d.senderRole || d.source || 'viewer'
-        };
-      });
+      rows.forEach(m => { inboxMessages[m.key] = m; });
       renderInbox();
       updateInboxBadge();
     });
@@ -1006,14 +958,11 @@
     const btn = document.getElementById('btnSend');
     btn.disabled = true;
 
-    db.ref('messages').push({
+    btv.sendMessage({
       message,
       user,
       displayName: user || 'BTV',
-      smsType: selectedType,
-      source: 'moderator',
-      senderRole: 'moderator',
-      ts: Date.now()
+      smsType: selectedType
     }).then(() => {
       document.getElementById('fMessage').value = '';
       document.getElementById('fUser').value    = '';
@@ -1095,14 +1044,14 @@
 
   /* ── Delete ── */
   function deleteMsg(key) {
-    db.ref('messages/' + key).remove()
+    btv.deleteMessage(key)
       .then(() => showToast('✓ Удалено'))
       .catch(err => showToast('✕ ' + err.message));
   }
 
   function clearAll() {
     if (!confirm('Удалить ВСЕ сообщения из базы?')) return;
-    db.ref('messages').remove()
+    btv.clearAllMessages()
       .then(() => showToast('✓ Все сообщения удалены'))
       .catch(err => showToast('✕ ' + err.message));
   }
@@ -1178,17 +1127,7 @@
     const m = inboxMessages[key];
     if (!m) return;
     if (messageStatus(m) === 'approved') return;
-    db.ref('messages').push({
-      message: m.message,
-      user: m.user,
-      displayName: m.displayName || m.user || '',
-      smsType: m.smsType,
-      source: m.source || 'viewer',
-      senderRole: m.senderRole || m.source || 'viewer',
-      ts: Date.now(),
-      inboxKey: key
-    })
-      .then(() => db.ref('inbox/' + key).update({ approved: true, status: 'approved', approvedAt: Date.now() }))
+    btv.approveInboxEntry(m)
       .then(() => showToast('✓ Отправлено на экран'))
       .catch(err => showToast('✕ ' + err.message));
   }
@@ -1196,7 +1135,7 @@
   function rejectInbox(key) {
     const m = inboxMessages[key];
     if (!m) return;
-    db.ref('inbox/' + key).update({ approved: false, status: 'rejected', rejectedAt: Date.now() })
+    btv.rejectInboxEntry(key)
       .then(() => showToast('✓ Отклонено'))
       .catch(err => showToast('✕ ' + err.message));
   }
@@ -1204,23 +1143,13 @@
   function repeatInbox(key) {
     const m = inboxMessages[key];
     if (!m || messageStatus(m) !== 'approved') return;
-    db.ref('messages').push({
-      message: m.message,
-      user: m.user,
-      displayName: m.displayName || m.user || '',
-      smsType: m.smsType,
-      source: m.source || 'viewer',
-      senderRole: m.senderRole || m.source || 'viewer',
-      ts: Date.now(),
-      inboxKey: key,
-      repeated: true
-    })
+    btv.repeatInboxEntry(m)
       .then(() => showToast('✓ Повторено в эфир'))
       .catch(err => showToast('✕ ' + err.message));
   }
 
   function deleteInbox(key) {
-    db.ref('inbox/' + key).remove()
+    btv.deleteInboxEntry(key)
       .then(() => showToast('✓ Удалено'))
       .catch(err => showToast('✕ ' + err.message));
   }
@@ -1303,23 +1232,20 @@
     btn.textContent = '…';
     err.textContent = '';
 
-    auth.signInWithEmailAndPassword(email, pass)
-      .catch(e => {
-        const msgs = {
-          'auth/invalid-email':      'Неверный формат email',
-          'auth/user-not-found':     'Пользователь не найден',
-          'auth/wrong-password':     'Неверный пароль',
-          'auth/invalid-credential': 'Неверный email или пароль',
-          'auth/too-many-requests':  'Слишком много попыток — подождите'
-        };
-        err.textContent = msgs[e.code] || ('Ошибка: ' + e.message);
-        btn.disabled = false;
-        btn.textContent = 'ВОЙТИ';
-      });
+    btv.signIn(email, pass).then(({ error }) => {
+      if (!error) return;
+      const msgs = {
+        'Invalid login credentials': 'Неверный email или пароль',
+        'Email not confirmed':       'Email не подтверждён'
+      };
+      err.textContent = msgs[error.message] || ('Ошибка: ' + error.message);
+      btn.disabled = false;
+      btn.textContent = 'ВОЙТИ';
+    });
   }
 
   function doLogout() {
-    auth.signOut();
+    btv.signOut();
   }
 
   function togglePass() {

@@ -21,29 +21,9 @@
   </select>
   <button onclick="sendMessage()">Отправить</button>
 
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-check-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
   <script>
-    const firebaseConfig = {
-    apiKey: "AIzaSyBF2P0A7uYJtCLYxOnKynMxPjkmpoJax9g",
-    authDomain: "btvrestored.firebaseapp.com",
-    projectId: "btvrestored",
-    databaseURL: "https://btvrestored-default-rtdb.europe-west1.firebasedatabase.app",
-    storageBucket: "btvrestored.firebasestorage.app",
-    messagingSenderId: "20099218532",
-    appId: "1:20099218532:web:a982d36059aacecba77371",
-    measurementId: "G-5Q6D5MNVFC"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-  const appCheck = firebase.appCheck();
-  appCheck.activate('6Letro4tAAAAAO_hk7XQrWX0OG6GjPARsB2U0uwJ', true);
-
-    const analytics = firebase.analytics();
-    const db = firebase.database();
-
     function sendMessage() {
       const message = document.getElementById('message').value.trim();
       const user = document.getElementById('user').value.trim();
@@ -51,15 +31,8 @@
 
       if (!message) return;
 
-      db.ref('messages').push({
-        message,
-        user,
-        displayName: user || 'BTV',
-        smsType,
-        source: 'moderator',
-        senderRole: 'moderator',
-        ts: Date.now()
-      });
+      btv.sendMessage({ message, user, displayName: user || 'BTV', smsType })
+        .catch(function(err) { console.error(err); });
 
       document.getElementById('message').value = '';
       document.getElementById('user').value = '';
