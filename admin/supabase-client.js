@@ -184,19 +184,21 @@ async function deleteInboxEntry(id) {
  * receive.html / index.html — wire these up once you share that file) ──── */
 
 async function submitInboxMessage({ message, userName, displayName, smsType }) {
-  const { data, error } = await sb
-    .from('inbox')
-    .insert({
-      message,
-      user_name: userName,
-      display_name: displayName,
-      sms_type: smsType,
-      ts: Date.now()
-    })
-    .select('id')
-    .single();
+  // Generate the id client-side and insert it explicitly instead of using
+  // .select() to read it back afterwards: an anonymous viewer has no SELECT
+  // permission on "inbox" (only admins do), so a post-insert .select() would
+  // be blocked by RLS and fail even though the insert itself succeeded.
+  const id = crypto.randomUUID();
+  const { error } = await sb.from('inbox').insert({
+    id,
+    message,
+    user_name: userName,
+    display_name: displayName,
+    sms_type: smsType,
+    ts: Date.now()
+  });
   if (error) throw error;
-  return data.id;
+  return id;
 }
 
 function watchInboxStatus(requestId, onUpdate, { intervalMs = 4000 } = {}) {
