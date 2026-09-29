@@ -13,10 +13,10 @@
  * and BEFORE your own <script> block that calls window.btv.*
  * ========================================================================== */
 
-const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR-ANON-PUBLIC-KEY';
+const SUPABASE_URL = 'https://cmjtxlevjnwugeyttexa.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_JPGJOa51xwNAm7Dk55F3Iw_IcNhhdxw'; // Settings → API Keys → Publishable key
 
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 function rowToMessage(r) {
   return {
