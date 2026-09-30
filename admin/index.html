@@ -4,609 +4,46 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Админ-панель</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:       #0a0c10;
-      --surface:  #111318;
-      --border:   #1e2230;
-      --accent:   #4f9eff;
-      --accent2:  #7c5cfc;
-      --text:     #c8d0e0;
-      --muted:    #4a5168;
-      --danger:   #ff4f4f;
-      --normal:   #c8d0e0;
-      --vip:      #ffaa00;
-      --glamour:  #cc66ff;
-      --express:  #ffee44;
-    }
-
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-    }
-
-    /* ── SCANLINE OVERLAY ── */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.08) 2px, rgba(0,0,0,.08) 4px);
-      pointer-events: none;
-      z-index: 9999;
-    }
-
-    /* ── LAYOUT ── */
-    .shell {
-      display: grid;
-      grid-template-rows: 56px 1fr;
-      grid-template-columns: 220px 1fr;
-      height: 100vh;
-    }
-
-    /* ── TOPBAR ── */
-    .topbar {
-      grid-column: 1 / -1;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 0 24px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-    }
-    .topbar-logo {
-      font-family: 'Unbounded', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: .05em;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .topbar-sep { flex: 1; }
-    .status-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #2ecc71;
-      box-shadow: 0 0 6px #2ecc71;
-      animation: pulse 2s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
-    .status-label { color: var(--muted); font-size: 11px; }
-
-    /* ── SIDEBAR ── */
-    .sidebar {
-      border-right: 1px solid var(--border);
-      background: var(--surface);
-      padding: 20px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      overflow-y: auto;
-    }
-    .nav-section {
-      padding: 6px 16px 2px;
-      font-size: 9px;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 20px;
-      cursor: pointer;
-      border-left: 2px solid transparent;
-      transition: background .15s, border-color .15s, color .15s;
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 12px;
-    }
-    .nav-item:hover { background: rgba(79,158,255,.06); color: var(--text); }
-    .nav-item.active {
-      border-left-color: var(--accent);
-      background: rgba(79,158,255,.1);
-      color: var(--accent);
-    }
-    .nav-item .ico { font-size: 14px; width: 18px; text-align: center; }
-    .nav-badge {
-      margin-left: auto;
-      background: var(--accent);
-      color: #000;
-      font-size: 9px;
-      font-weight: 700;
-      padding: 1px 6px;
-      border-radius: 20px;
-      min-width: 18px;
-      text-align: center;
-      display: none;
-    }
-    .nav-badge.visible { display: block; }
-
-    /* ── MAIN ── */
-    .main {
-      overflow-y: auto;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* ── PAGE TITLE ── */
-    .page-title {
-      font-family: 'Unbounded', sans-serif;
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: -.01em;
-    }
-    .page-subtitle { color: var(--muted); font-size: 11px; margin-top: 4px; }
-
-    /* ── STATS ROW ── */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-      position: relative;
-      overflow: hidden;
-    }
-    .stat-card::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-    }
-    .stat-val {
-      font-family: 'Unbounded', sans-serif;
-      font-size: 22px;
-      font-weight: 700;
-      color: #fff;
-    }
-    .stat-label { color: var(--muted); font-size: 11px; margin-top: 4px; }
-
-    /* ── GRID 2-COL ── */
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 16px;
-      align-items: start;
-    }
-
-    /* ── CARD ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border);
-      font-size: 11px;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .card-header .dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
-    .card-body { padding: 18px; }
-
-    /* ── FORM ── */
-    .form-group { margin-bottom: 14px; }
-    label {
-      display: block;
-      font-size: 10px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    input, select, textarea {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 9px 12px;
-      color: var(--text);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      outline: none;
-      transition: border-color .15s, box-shadow .15s;
-    }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(79,158,255,.15);
-    }
-    select option { background: var(--bg); }
-    textarea { resize: vertical; min-height: 80px; }
-
-    /* TYPE PILLS */
-    .type-pills {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-    .pill {
-      padding: 6px 14px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-      cursor: pointer;
-      font-size: 11px;
-      font-family: 'JetBrains Mono', monospace;
-      transition: all .15s;
-      background: var(--bg);
-      color: var(--muted);
-    }
-    .pill:hover { border-color: var(--muted); color: var(--text); }
-    .pill.sel-normal  { border-color: var(--normal);  color: var(--normal);  background: rgba(200,208,224,.08); }
-    .pill.sel-vip     { border-color: var(--vip);     color: var(--vip);     background: rgba(255,170,0,.08); }
-    .pill.sel-glamour { border-color: var(--glamour); color: var(--glamour); background: rgba(204,102,255,.08); }
-    .pill.sel-express { border-color: var(--express); color: var(--express); background: rgba(255,238,68,.08); }
-
-    /* SEND BUTTON */
-    .btn-send {
-      width: 100%;
-      padding: 11px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none;
-      border-radius: 5px;
-      color: #fff;
-      font-family: 'Unbounded', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .05em;
-      cursor: pointer;
-      transition: opacity .15s, transform .1s;
-    }
-    .btn-send:hover { opacity: .9; }
-    .btn-send:active { transform: scale(.98); }
-    .btn-send:disabled { opacity: .4; cursor: not-allowed; }
-    .quick-templates {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 6px;
-      margin-top: 8px;
-    }
-    .template-btn {
-      padding: 7px 9px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--muted);
-      cursor: pointer;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      text-align: left;
-      transition: color .15s, border-color .15s, background .15s;
-    }
-    .template-btn:hover { border-color: var(--accent); color: var(--text); background: rgba(79,158,255,.06); }
-    .send-preview {
-      margin-top: 12px;
-      padding: 10px 12px;
-      border: 1px dashed var(--border);
-      border-radius: 5px;
-      background: rgba(0,0,0,.18);
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.45;
-      min-height: 42px;
-    }
-
-    /* TOAST */
-    #toast {
-      position: fixed;
-      bottom: 28px; right: 28px;
-      background: #1c2030;
-      border: 1px solid var(--accent);
-      border-radius: 6px;
-      padding: 12px 20px;
-      font-size: 12px;
-      color: var(--accent);
-      box-shadow: 0 4px 20px rgba(0,0,0,.6);
-      opacity: 0;
-      transform: translateY(12px);
-      transition: opacity .25s, transform .25s;
-      pointer-events: none;
-      z-index: 1000;
-    }
-    #toast.show { opacity: 1; transform: translateY(0); }
-
-    /* ── MESSAGE LOG ── */
-    .msg-log {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      max-height: 520px;
-      overflow-y: auto;
-    }
-    .msg-log::-webkit-scrollbar { width: 4px; }
-    .msg-log::-webkit-scrollbar-track { background: transparent; }
-    .msg-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-    .msg-row {
-      display: grid;
-      grid-template-columns: 1fr 80px 100px 30px;
-      gap: 12px;
-      align-items: center;
-      padding: 10px 18px;
-      border-bottom: 1px solid var(--border);
-      transition: background .1s;
-      animation: slideIn .3s ease;
-    }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-8px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-    .msg-row:hover { background: rgba(255,255,255,.02); }
-    .msg-row:last-child { border-bottom: none; }
-
-    .msg-text { color: var(--text); word-break: break-word; }
-    .msg-user { color: var(--muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .msg-time { color: var(--muted); font-size: 10px; text-align: right; }
-
-    .tag {
-      display: inline-block;
-      padding: 2px 7px;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      border: 1px solid;
-    }
-    .tag-normal  { color: var(--normal);  border-color: rgba(200,208,224,.3); }
-    .tag-vip     { color: var(--vip);     border-color: rgba(255,170,0,.4); }
-    .tag-glamour { color: var(--glamour); border-color: rgba(204,102,255,.4); }
-    .tag-express { color: var(--express); border-color: rgba(255,238,68,.4); }
-
-    .del-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--muted);
-      font-size: 14px;
-      padding: 2px;
-      transition: color .15s;
-      line-height: 1;
-    }
-    .del-btn:hover { color: var(--danger); }
-
-    .log-header {
-      display: grid;
-      grid-template-columns: 1fr 80px 100px 30px;
-      gap: 12px;
-      padding: 8px 18px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(0,0,0,.2);
-    }
-    .log-header span {
-      font-size: 9px;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .empty-state {
-      padding: 40px 18px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .empty-state .ico { font-size: 28px; margin-bottom: 10px; }
-
-    /* ── TOOLS ROW ── */
-    .tools-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      padding: 10px 18px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(0,0,0,.15);
-      flex-wrap: wrap;
-    }
-    .filter-pill {
-      padding: 4px 10px;
-      border-radius: 3px;
-      border: 1px solid var(--border);
-      cursor: pointer;
-      font-size: 10px;
-      font-family: 'JetBrains Mono', monospace;
-      background: none;
-      color: var(--muted);
-      transition: all .12s;
-    }
-    .filter-pill:hover { border-color: var(--muted); color: var(--text); }
-    .filter-pill.active { border-color: var(--accent); color: var(--accent); background: rgba(79,158,255,.1); }
-    .filter-pill.danger.active { border-color: var(--danger); color: var(--danger); background: rgba(255,79,79,.1); }
-    .tool-sep { flex: 1; }
-    .btn-clear-all {
-      padding: 4px 10px;
-      border-radius: 3px;
-      border: 1px solid rgba(255,79,79,.3);
-      cursor: pointer;
-      font-size: 10px;
-      font-family: 'JetBrains Mono', monospace;
-      background: none;
-      color: var(--danger);
-      transition: all .12s;
-    }
-    .btn-clear-all:hover { background: rgba(255,79,79,.1); }
-
-    /* ── WIDGET LINKS ── */
-    .widget-links {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .widget-link {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      text-decoration: none;
-      color: var(--text);
-      transition: border-color .15s, background .15s;
-    }
-    .widget-link:hover { border-color: var(--accent); background: rgba(79,158,255,.05); }
-    .widget-link-ico { font-size: 20px; }
-    .widget-link-info { flex: 1; }
-    .widget-link-name { font-size: 12px; color: #fff; }
-    .widget-link-desc { font-size: 10px; color: var(--muted); margin-top: 2px; }
-    .widget-link-arr { color: var(--muted); }
-
-    /* ── SEARCH ── */
-    .search-wrap {
-      position: relative;
-      margin-left: auto;
-    }
-    .search-wrap input {
-      width: 160px;
-      padding: 4px 10px 4px 28px;
-      font-size: 11px;
-    }
-    .search-ico {
-      position: absolute;
-      left: 9px; top: 50%;
-      transform: translateY(-50%);
-      color: var(--muted);
-      font-size: 12px;
-      pointer-events: none;
-    }
-
-    /* responsive */
-    .inbox-row {
-      display: grid;
-      grid-template-columns: 1fr 80px 120px 150px;
-      gap: 12px;
-      align-items: center;
-      padding: 10px 18px;
-      border-bottom: 1px solid var(--border);
-      transition: background .1s;
-      animation: slideIn .3s ease;
-    }
-    .inbox-row:hover { background: rgba(255,255,255,.02); }
-    .inbox-row.approved { opacity: .5; }
-    .inbox-row.rejected { opacity: .45; }
-    .btn-approve {
-      padding: 4px 10px;
-      border-radius: 3px;
-      border: 1px solid rgba(46,204,113,.4);
-      cursor: pointer;
-      font-size: 10px;
-      font-family: 'JetBrains Mono', monospace;
-      background: none;
-      color: #2ecc71;
-      transition: all .12s;
-      margin-right: 4px;
-    }
-    .btn-approve:hover { background: rgba(46,204,113,.15); }
-    .btn-approve.done { opacity:.4; cursor:default; pointer-events:none; }
-    .btn-reject {
-      padding: 4px 10px;
-      border-radius: 3px;
-      border: 1px solid rgba(255,79,79,.4);
-      cursor: pointer;
-      font-size: 10px;
-      font-family: 'JetBrains Mono', monospace;
-      background: none;
-      color: var(--danger);
-      transition: all .12s;
-    }
-    .btn-reject:hover { background: rgba(255,79,79,.15); }
-    .btn-repeat {
-      padding: 4px 10px;
-      border-radius: 3px;
-      border: 1px solid rgba(79,158,255,.4);
-      cursor: pointer;
-      font-size: 10px;
-      font-family: 'JetBrains Mono', monospace;
-      background: none;
-      color: var(--accent);
-      transition: all .12s;
-    }
-    .btn-repeat:hover { background: rgba(79,158,255,.15); }
-    .status-pill {
-      display: inline-block;
-      margin-top: 5px;
-      padding: 1px 6px;
-      border-radius: 3px;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-    }
-    .status-pending { border-color: rgba(79,158,255,.35); color: var(--accent); }
-    .status-approved { border-color: rgba(46,204,113,.35); color: #2ecc71; }
-    .status-rejected { border-color: rgba(255,79,79,.35); color: var(--danger); }
-
-    @media (max-width: 900px) {
-      .stats-row { grid-template-columns: repeat(2, 1fr); }
-      .grid-2    { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 600px) {
-      .shell { grid-template-columns: 1fr; }
-      .sidebar { display: none; }
-    }
-  </style>
+  
+  <link rel="stylesheet" href="admin.css">
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></symbol><symbol id="i-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></symbol><symbol id="i-log" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol><symbol id="i-form" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M7 9h10M7 13h6"/></symbol><symbol id="i-tv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="1"/><path d="M8 22h8"/></symbol><symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol><symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></symbol></defs></svg>
 
 <div class="shell" id="shell" style="display:none;">
 
   <!-- TOPBAR -->
   <header class="topbar">
-    <span class="topbar-logo">⬡ ADMIN</span>
+    
     <span class="topbar-sep"></span>
     <span class="status-dot" id="connDot"></span>
     <span class="status-label" id="connLabel">подключение…</span>
-    <span style="color:#4a5168;font-size:11px;margin-left:12px;" id="authEmail"></span>
-    <button onclick="doLogout()" style="margin-left:10px;background:none;border:1px solid #1e2230;border-radius:3px;padding:3px 10px;font-size:11px;color:#4a5168;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .12s;" onmouseover="this.style.color='#ff4f4f';this.style.borderColor='rgba(255,79,79,.4)'" onmouseout="this.style.color='#4a5168';this.style.borderColor='#1e2230'">выйти</button>
+    <span id="authEmail"></span>
+    <button class="logout" onclick="doLogout()">Выйти</button>
   </header>
 
   <!-- SIDEBAR -->
   <nav class="sidebar">
+    <img class="side-logo" src="img/logo.png" alt="BRIDGE TV">
     <div class="nav-section">Панель</div>
     <a class="nav-item active" onclick="showPage('send')" href="#send">
-      <span class="ico">✉</span> Отправить SMS
+      <svg class="ico"><use href="#i-send"/></svg> Отправить SMS
     </a>
     <a class="nav-item" onclick="showPage('inbox')" href="#inbox">
-      <span class="ico">📥</span> Входящие
+      <svg class="ico"><use href="#i-inbox"/></svg> Входящие
       <span class="nav-badge" id="badgeInbox">0</span>
     </a>
     <a class="nav-item" onclick="showPage('log')" href="#log">
-      <span class="ico">☰</span> Лог сообщений
+      <svg class="ico"><use href="#i-log"/></svg> Лог сообщений
       <span class="nav-badge" id="badgeLog">0</span>
     </a>
 
     <div class="nav-section" style="margin-top:16px;">Инструменты</div>
     <a class="nav-item" href="receive.html" target="_blank">
-      <span class="ico">📤</span> Форма отправки
+      <svg class="ico"><use href="#i-form"/></svg> Форма отправки
     </a>
     <a class="nav-item" href="chat.html" target="_blank">
-      <span class="ico">📺</span> Виджет (OBS)
+      <svg class="ico"><use href="#i-tv"/></svg> Виджет (OBS)
     </a>
   </nav>
 
@@ -672,7 +109,7 @@
               </div>
             </div>
             <div class="send-preview" id="sendPreview">Предпросмотр появится здесь.</div>
-            <button class="btn-send" id="btnSend" onclick="sendMessage()">↑ ОТПРАВИТЬ</button>
+            <button class="btn-send" id="btnSend" onclick="sendMessage()">Отправить</button>
           </div>
         </div>
 
@@ -683,7 +120,7 @@
             <div class="card-body">
               <div class="widget-links">
                 <a class="widget-link" href="receive.html" target="_blank">
-                  <span class="widget-link-ico">📤</span>
+                  <svg class="ico"><use href="#i-form"/></svg>
                   <div class="widget-link-info">
                     <div class="widget-link-name">Форма отправки</div>
                     <div class="widget-link-desc">receive.html — упрощённый интерфейс</div>
@@ -691,7 +128,7 @@
                   <span class="widget-link-arr">→</span>
                 </a>
                 <a class="widget-link" href="chat.html" target="_blank">
-                  <span class="widget-link-ico">📺</span>
+                  <svg class="ico"><use href="#i-tv"/></svg>
                   <div class="widget-link-info">
                     <div class="widget-link-name">OBS Виджет</div>
                     <div class="widget-link-desc">chat.html — Browser Source для стрима</div>
@@ -706,7 +143,7 @@
           <div class="card">
             <div class="card-header"><div class="dot"></div> Последние сообщения</div>
             <div id="preview5" style="max-height:220px;overflow-y:auto;">
-              <div class="empty-state"><div class="ico">⌛</div>Загрузка…</div>
+              <div class="empty-state">Загрузка…</div>
             </div>
           </div>
         </div>
@@ -732,7 +169,7 @@
           <button class="filter-pill"        data-role="moderator" onclick="setRoleFilter(this)">Только модераторы</button>
           <div class="tool-sep"></div>
           <div class="search-wrap">
-            <span class="search-ico">🔍</span>
+            <svg class="search-ico"><use href="#i-search"/></svg>
             <input id="searchInput" placeholder="Поиск по тексту или имени…" oninput="renderLog()">
           </div>
           <button class="btn-clear-all" onclick="clearAll()">✕ Очистить всё</button>
@@ -744,7 +181,7 @@
           <span></span>
         </div>
         <div class="msg-log" id="msgLog">
-          <div class="empty-state"><div class="ico">⌛</div>Загрузка…</div>
+          <div class="empty-state">Загрузка…</div>
         </div>
       </div>
     </div>
@@ -766,7 +203,7 @@
           <button class="filter-pill danger" data-if="rejected" onclick="setInboxFilter(this)">Отклонены</button>
           <button class="filter-pill"        data-if="all"     onclick="setInboxFilter(this)">Все</button>
           <div class="search-wrap">
-            <span class="search-ico">🔍</span>
+            <svg class="search-ico"><use href="#i-search"/></svg>
             <input id="inboxSearch" placeholder="Поиск по имени…" oninput="renderInbox()">
           </div>
         </div>
@@ -777,7 +214,7 @@
           <span style="text-align:center">Действие</span>
         </div>
         <div id="inboxList" style="max-height:560px;overflow-y:auto;">
-          <div class="empty-state"><div class="ico">⌛</div>Загрузка…</div>
+          <div class="empty-state">Загрузка…</div>
         </div>
       </div>
     </div>
@@ -786,71 +223,27 @@
 </div>
 
 
-<!-- LOGIN OVERLAY -->
-<div id="loginOverlay" style="
-  position:fixed;inset:0;
-  background:#0a0c10;
-  display:flex;align-items:center;justify-content:center;
-  z-index:10000;
-  font-family:'JetBrains Mono',monospace;
-">
-  <!-- scanlines -->
-  <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.1) 2px,rgba(0,0,0,.1) 4px);pointer-events:none;"></div>
-
-  <div style="
-    position:relative;
-    width:360px;
-    background:#111318;
-    border:1px solid #1e2230;
-    border-radius:10px;
-    overflow:hidden;
-    box-shadow:0 24px 60px rgba(0,0,0,.7);
-  ">
-    <!-- top accent line -->
-    <div style="height:3px;background:linear-gradient(90deg,#4f9eff,#7c5cfc);"></div>
-
-    <div style="padding:32px 28px 28px;">
-      <div style="
-        font-family:'Unbounded',sans-serif;
-        font-size:18px;font-weight:700;
-        background:linear-gradient(90deg,#4f9eff,#7c5cfc);
-        -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-        margin-bottom:6px;
-      ">⬡ ADMIN PANEL</div>
-      <div style="color:#4a5168;font-size:11px;margin-bottom:28px;">Bridge TV — авторизация</div>
-
-      <div style="margin-bottom:14px;">
-        <label style="display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#4a5168;margin-bottom:6px;">Email</label>
-        <input id="loginEmail" type="email" autocomplete="username"
-          placeholder="admin@bridgetv.ru"
-          style="width:100%;background:#0a0c10;border:1px solid #1e2230;border-radius:5px;padding:10px 12px;color:#c8d0e0;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;transition:border-color .15s;"
-          onfocus="this.style.borderColor='#4f9eff'" onblur="this.style.borderColor='#1e2230'">
-      </div>
-
-      <div style="margin-bottom:20px;">
-        <label style="display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#4a5168;margin-bottom:6px;">Пароль</label>
-        <div style="position:relative;">
-          <input id="loginPass" type="password" autocomplete="current-password"
-            placeholder="••••••••"
-            style="width:100%;background:#0a0c10;border:1px solid #1e2230;border-radius:5px;padding:10px 40px 10px 12px;color:#c8d0e0;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;transition:border-color .15s;"
-            onfocus="this.style.borderColor='#4f9eff'" onblur="this.style.borderColor='#1e2230'"
-            onkeydown="if(event.key==='Enter')doLogin()">
-          <button onclick="togglePass()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4a5168;font-size:14px;padding:2px;" title="Показать пароль">👁</button>
-        </div>
-      </div>
-
-      <button onclick="doLogin()" id="loginBtn" style="
-        width:100%;padding:12px;
-        background:linear-gradient(135deg,#4f9eff,#7c5cfc);
-        border:none;border-radius:5px;
-        color:#fff;font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;letter-spacing:.05em;
-        cursor:pointer;transition:opacity .15s;
-      ">ВОЙТИ</button>
-
-      <div id="loginError" style="margin-top:12px;font-size:12px;color:#ff4f4f;min-height:18px;text-align:center;"></div>
-    </div>
-  </div>
+<!-- LOGIN -->
+<div id="loginOverlay" class="login-screen">
+  <main class="login">
+    <img class="login-logo" src="img/logo.png" alt="BRIDGE TV">
+    <form class="login-panel" onsubmit="event.preventDefault(); doLogin();">
+      <h1>Вход в админ-панель</h1>
+      <div class="form-group"><label for="loginEmail">E-mail</label><input id="loginEmail" type="email" autocomplete="username"></div>
+      <div class="form-group"><label for="loginPass">Пароль</label>
+        <div class="input-wrap"><input id="loginPass" type="password" autocomplete="current-password">
+          <button type="button" class="eye" onclick="togglePass()" aria-label="Показать пароль"><svg class="ico"><use href="#i-eye"/></svg></button></div></div>
+      <div class="login-actions"><div id="loginError" role="alert"></div><button type="submit" id="loginBtn">Войти</button></div>
+    </form>
+  </main>
 </div>
+
+<!-- Нижнее меню для телефона -->
+<nav class="tabbar">
+  <a class="nav-item active" onclick="showPage('send')" href="#send"><svg class="ico"><use href="#i-send"/></svg>Отправить</a>
+  <a class="nav-item" onclick="showPage('inbox')" href="#inbox"><svg class="ico"><use href="#i-inbox"/></svg>Входящие</a>
+  <a class="nav-item" onclick="showPage('log')" href="#log"><svg class="ico"><use href="#i-log"/></svg>Лог</a>
+</nav>
 
 <div id="toast"></div>
 
@@ -883,8 +276,7 @@
   function startListeners() {
     /* ── Connection indicator ── */
     btv.watchConnection(ok => {
-      document.getElementById('connDot').style.background   = ok ? '#2ecc71' : '#e74c3c';
-      document.getElementById('connDot').style.boxShadow    = ok ? '0 0 6px #2ecc71' : '0 0 6px #e74c3c';
+      document.getElementById('connDot').classList.toggle('off', !ok);
       document.getElementById('connLabel').textContent       = ok ? 'подключено' : 'нет соединения';
     });
 
@@ -1006,7 +398,7 @@
       .sort(([,a],[,b]) => (b.ts||0) - (a.ts||0));
 
     if (entries.length === 0) {
-      container.innerHTML = `<div class="empty-state"><div class="ico">💬</div>${search ? 'Ничего не найдено' : 'Сообщений нет'}</div>`;
+      container.innerHTML = `<div class="empty-state">${search ? 'Ничего не найдено' : 'Сообщений нет'}</div>`;
       return;
     }
 
@@ -1031,7 +423,7 @@
       .sort(([,a],[,b]) => (b.ts||0) - (a.ts||0))
       .slice(0, 5);
     if (entries.length === 0) {
-      container.innerHTML = `<div class="empty-state"><div class="ico">💬</div>Нет сообщений</div>`;
+      container.innerHTML = `<div class="empty-state">Нет сообщений</div>`;
       return;
     }
     container.innerHTML = entries.map(([,m]) => `
@@ -1095,7 +487,7 @@
       .sort(([,a],[,b]) => (b.ts||0) - (a.ts||0));
 
     if (entries.length === 0) {
-      container.innerHTML = `<div class="empty-state"><div class="ico">${inboxFilter==='pending' ? '✅' : '💬'}</div>${
+      container.innerHTML = `<div class="empty-state">${
         inboxFilter==='pending' ? 'Нет ожидающих сообщений' : 'Пусто'
       }</div>`;
       return;
@@ -1240,7 +632,7 @@
       };
       err.textContent = msgs[error.message] || ('Ошибка: ' + error.message);
       btn.disabled = false;
-      btn.textContent = 'ВОЙТИ';
+      btn.textContent = 'Войти';
     });
   }
 
