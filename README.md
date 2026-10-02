@@ -1,4 +1,4 @@
-# BRIDGE TV — Project Restored
+# BRIDGE TV: Project Restored
 
 > 🇷🇺 Русская версия ниже · 🇬🇧 English version below
 
@@ -13,7 +13,7 @@
 
 ## О проекте
 
-**BRIDGE TV — Project Restored** — статический веб-проект, посвящённый реконструкции сайта и эфирной инфраструктуры в стиле BRIDGE TV.
+**BRIDGE TV: Project Restored** — статический веб-проект, посвящённый реконструкции сайта и эфирной инфраструктуры в стиле BRIDGE TV.
 
 Проект объединяет:
 
@@ -222,8 +222,8 @@ http://localhost:8080/
 
 ## Credits
 
-**BRIDGE TV — Project Restored**  
-Presented by **BM-PR**.
+**BRIDGE TV: Project Restored**  
+Presented by **BRIDGE MEDIA: Project Restored (BM-PR)**.
 
 Это независимый проект по восстановлению и реконструкции и **не является официальным проектом BRIDGE MEDIA**.
 
@@ -245,7 +245,7 @@ BRIDGE TV, исторический брендинг, названия прог�
 
 ## About
 
-**BRIDGE TV — Project Restored** is a static web project built around a recreated BRIDGE TV-style website and accompanying live/on-air infrastructure.
+**BRIDGE TV: Project Restored** is a static web project built around a recreated BRIDGE TV-style website and accompanying live/on-air infrastructure.
 
 The project combines:
 
@@ -259,7 +259,7 @@ The project combines:
 - an administration panel for moderation and on-air messages;
 - Supabase realtime updates.
 
-The project is presented by **BM-PR** and is **not affiliated with BRIDGE MEDIA**.
+The project is presented by **BRIDGE MEDIA: Project Restored (BM-PR)** and is **not affiliated with BRIDGE MEDIA**.
 
 ## Website
 
@@ -455,7 +455,7 @@ When changing the public message system, keep the API exposed by `window.btv` co
 ## Credits
 
 **BRIDGE TV — Project Restored**  
-Presented by **BM-PR**.
+Presented by **BRIDGE MEDIA: Project Restored (BM-PR)**.
 
 This is an independent restoration / reconstruction project and is **not affiliated with BRIDGE MEDIA**.
 
