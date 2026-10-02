@@ -1,0 +1,6 @@
+/* Gotham Pro (Hoefler & Co.) — подключение шрифта для всех страниц сайта */
+@font-face{font-family:"Gotham Pro";src:url("fonts/gothampro_light.woff") format("woff");font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:"Gotham Pro";src:url("fonts/gothampro.woff") format("woff");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Gotham Pro";src:url("fonts/gothampro_medium.woff") format("woff");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"Gotham Pro";src:url("fonts/gothampro_bold.woff") format("woff");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:"Gotham Pro";src:url("fonts/gothampro_black.woff") format("woff");font-weight:900;font-style:normal;font-display:swap}

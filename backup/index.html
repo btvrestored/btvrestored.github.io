@@ -3,82 +3,326 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#070707">
   <title>BRIDGE TV - Project Restored</title>
-  <link rel="icon" href="favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="stylesheet" href="fonts.css">
-  <link rel="stylesheet" href="home.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&subset=cyrillic,latin&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f2f2f2;
+      --panel:#fff;
+      --black:#070707;
+      --orange:#ff6a00;
+      --orange2:#ff8a2d;
+      --text:#222;
+      --line:#e6e6e6;
+      --blue:#235fa8;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: 'Roboto', Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg,#fbfbfb 0%, #ededed 42%, #d8d8d8 100%);
+      color:var(--text);
+    }
+    a{color:inherit;text-decoration:none}
+    .page{
+      width:min(1000px, calc(100% - 24px));
+      margin:14px auto 24px;
+      background:var(--panel);
+      box-shadow:0 0 0 1px rgba(0,0,0,.06);
+    }
+    header{
+      background:var(--black);
+      color:#fff;
+      padding:18px 22px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+    }
+    .logo{
+      display:flex;
+      align-items:baseline;
+      gap:6px;
+      font-size:34px;
+      font-weight:900;
+      letter-spacing:-1px;
+      line-height:1;
+    }
+    .logo span:last-child{
+      background:var(--orange);
+      color:#111;
+      padding:0 8px;
+      border-radius:2px;
+    }
+    .top-right{
+      text-align:right;
+      font-size:14px;
+      line-height:1.7;
+    }
+    .top-right .lang{
+      opacity:.95;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:6px;
+    }
+    nav{
+      display:flex;
+      justify-content:center;
+      gap:40px;
+      padding:16px 14px 15px;
+      border-bottom:1px solid #ededed;
+      font-size:16px;
+    }
+    nav a{color:#222}
+    .main{
+      display:grid;
+      grid-template-columns:1fr 195px;
+      gap:18px;
+      padding:18px 18px 0;
+    }
+    .hero{
+      background:linear-gradient(180deg,#ff4d52 0%, #ff8c35 100%);
+      border:3px solid #ffb26a;
+      border-radius:6px;
+      min-height:256px;
+      color:#fff;
+      padding:18px 22px;
+      text-align:center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
+    }
+    .hero h1{
+      margin:0 0 28px;
+      font-size:52px;
+      line-height:1.04;
+      letter-spacing:-1px;
+    }
+    .hero p{
+      margin:12px auto;
+      font-size:18px;
+      line-height:1.45;
+      max-width:760px;
+    }
+    .hero a{
+      display:inline-block;
+      margin-top:34px;
+      color:var(--blue);
+      font-size:18px;
+      text-decoration:underline;
+      font-weight:700;
+    }
+    .side .promo{
+      border:1px solid var(--line);
+      background:#fff;
+      margin-bottom:18px;
+    }
+    .side .promo h3{
+      margin:0;
+      padding:10px 12px;
+      background:#111;
+      color:#fff;
+      font-size:18px;
+      text-align:center;
+    }
+    .ad{
+      height:250px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.16), rgba(0,0,0,.14)),
+        linear-gradient(180deg, #cffd2b 0%, #95d800 100%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      color:#122;
+      font-size:26px;
+      text-align:center;
+      padding:14px;
+    }
+    .now{
+      background:linear-gradient(180deg, #ff8a35 0%, #ff6f16 100%);
+      color:#fff;
+      border-radius:4px;
+      overflow:hidden;
+    }
+    .now h3{
+      margin:0;
+      padding:14px 14px 10px;
+      font-size:18px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .schedule{
+      padding:0 14px 12px;
+      font-size:14px;
+    }
+    .schedule div{
+      border-top:1px solid rgba(255,255,255,.25);
+      padding:9px 0;
+      line-height:1.35;
+    }
+    .schedule b{display:block}
+    .section{
+      padding:18px 18px 20px;
+    }
+    .section h2{
+      margin:0 0 14px;
+      color:#e46500;
+      font-size:24px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:18px;
+    }
+    .card .img{
+      height:100px;
+      border-radius:2px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.2), rgba(0,0,0,.18)),
+        linear-gradient(135deg, #2941ff, #8ad7ff);
+    }
+    .card:nth-child(2) .img{
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.2), rgba(0,0,0,.18)),
+        linear-gradient(135deg, #6b4c32, #ead8b0);
+    }
+    .card:nth-child(3) .img{
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.2), rgba(0,0,0,.18)),
+        linear-gradient(135deg, #2b0e2f, #ff5ea8);
+    }
+    .card h4{
+      margin:10px 0 7px;
+      color:var(--blue);
+      font-size:16px;
+      text-decoration:underline;
+    }
+    .card p{
+      margin:0;
+      font-size:14px;
+      line-height:1.45;
+      color:#333;
+    }
+    .lang-btn{
+      background:none;
+      border:1px solid rgba(255,255,255,.35);
+      color:#fff;
+      border-radius:3px;
+      padding:2px 8px;
+      font-size:13px;
+      cursor:pointer;
+      opacity:.7;
+      transition:opacity .15s;
+    }
+    .lang-btn:hover{opacity:1}
+    .lang-btn.active{opacity:1; border-color:#fff; font-weight:700;}
+    footer{
+      padding:16px 18px 22px;
+      color:#777;
+      font-size:13px;
+      border-top:1px solid #eee;
+    }
+    .video-frame{
+      position:relative;
+      width:100%;
+      aspect-ratio:16/9;
+      min-height:220px;
+      background:#000;
+      border-radius:6px;
+      overflow:hidden;
+    }
+    .video-frame iframe{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+      background:#000;
+    }
+    .video-fallback{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      margin-top:8px;
+      padding:10px 14px;
+      background:var(--orange);
+      border-radius:4px;
+      font-size:13px;
+      color:#fff;
+      text-decoration:none;
+      font-weight:700;
+      box-shadow:0 2px 0 rgba(0,0,0,.16);
+    }
+    .video-note{
+      display:inline-block;
+      margin-left:10px;
+      font-size:12px;
+      color:#777;
+    }
+    .msg-preview{
+      margin-top:12px;
+      padding:10px 12px;
+      background:#fff;
+      border:1px dashed #d2d2d2;
+      border-radius:4px;
+      color:#333;
+      font-size:13px;
+      min-height:38px;
+    }
+    .request-status{
+      margin-top:10px;
+      padding:9px 11px;
+      border-radius:4px;
+      background:#fff;
+      border:1px solid #e2e2e2;
+      color:#666;
+      font-size:13px;
+      display:none;
+    }
+    .request-status.visible{display:block}
+    .history-today{
+      padding:18px 18px 0;
+    }
+    .history-card{
+      background:#111;
+      color:#fff;
+      border-radius:6px;
+      padding:16px 18px;
+      border-left:6px solid var(--orange);
+    }
+    .history-card h2{
+      margin:0 0 8px;
+      font-size:20px;
+      color:#fff;
+    }
+    .history-card p{
+      margin:0;
+      line-height:1.45;
+      color:#e5e5e5;
+    }
+    @media (max-width: 860px){
+      header{flex-direction:column; align-items:flex-start}
+      .main{grid-template-columns:1fr}
+      .cards{grid-template-columns:1fr}
+      nav{gap:16px; flex-wrap:wrap}
+      .logo{font-size:28px}
+      .hero h1{font-size:34px}
+      .hero p{font-size:17px}
+      .video-frame{min-height:180px}
+    }
+  </style>
 </head>
 <body>
-  <!-- HERO: видео на фоне -->
-  <section class="hero-screen">
-    <video class="hero-video" id="heroVideo" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
-    <noscript><video class="hero-video" autoplay muted loop playsinline aria-hidden="true" src="hero.webm"></video></noscript>
-    <script>
-      /* Выбор hero-видео по пропорциям экрана.
-         Широкий экран (16:9, 16:10, ультравайд) -> 1920x1080, почти квадратный (4:3, 5:4) и портрет -> 1440x1080.
-         Грузится только одно видео; при смене окна/поворота экрана выбор обновляется. */
-      (function () {
-        var v = document.getElementById('heroVideo');
-        if (!v) return;
-        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; /* без анимации — видео не грузим */
-        var net = navigator.connection || {};
-        if (net.saveData || /(^|-)2g$/.test(net.effectiveType || '')) return;                    /* экономия трафика / очень медленная сеть */
-
-        var WIDE_FROM = 1.5;   /* ширина/высота блока: от 1.5 (3:2) и шире — «широкое» видео */
-        var PHONE_MAX = 760;   /* экран уже этого (телефон в портрете) — лёгкое вертикальное видео */
-        var VIDEOS = {
-          wide:  [['hero.webm', 'video/webm'], ['hero-wide.mp4', 'video/mp4']], /* hero-wide.mp4 — необязательный запасной для Safari */
-          std:   [['hero.mp4',  'video/mp4']],
-          phone: [['hero-mobile.mp4', 'video/mp4'], ['hero.mp4', 'video/mp4']]  /* нет hero-mobile.mp4 — возьмётся hero.mp4 */
-        };
-        var hero = v.parentNode, current = null, timer;
-
-        function pick() {
-          var w = hero.clientWidth || window.innerWidth;
-          var h = hero.clientHeight || window.innerHeight;
-          var kind = (w <= PHONE_MAX) ? 'phone' : (w / h >= WIDE_FROM ? 'wide' : 'std');
-          if (kind === current) return;
-          current = kind;
-          v.innerHTML = '';
-          VIDEOS[kind].forEach(function (f) {
-            var s = document.createElement('source');
-            s.src = f[0]; s.type = f[1];
-            v.appendChild(s);
-          });
-          v.load();
-          var p = v.play();
-          if (p && p.catch) p.catch(function () {});
-        }
-
-        pick();
-        window.addEventListener('resize', function () { clearTimeout(timer); timer = setTimeout(pick, 250); });
-
-        /* видео вне экрана не крутим — экономим батарею */
-        if ('IntersectionObserver' in window) {
-          new IntersectionObserver(function (e) {
-            if (e[0].isIntersecting) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
-            else v.pause();
-          }, { threshold: 0.05 }).observe(hero);
-        }
-      })();
-    </script>
-    <div class="hero-overlay"></div>
-
-    <header class="site-header">
+  <div class="page">
+    <header>
       <div class="logo">
         <img src="logo.png" alt="BRIDGE TV" height="48">
       </div>
-      <nav>
-        <a href="shows.html" data-i18n="nav_shows">Shows</a>
-        <a href="repeats.html" data-i18n="nav_repeats">Repeats</a>
-        <a href="identity.html" data-i18n="nav_identity">Archive</a>
-        <a href="about.html" data-i18n="nav_about">About</a>
-        <a href="order.html" data-i18n="nav_order">Order clip</a>
-      </nav>
       <div class="top-right">
         <div class="lang">
           language:
@@ -88,29 +332,22 @@
       </div>
     </header>
 
-    <div class="hero-content">
-      <h1>Restored from past.<span>Live for future.</span></h1>
-      <p data-i18n="hero_tagline">The alternative music channel is back on air</p>
-    </div>
+    <nav>
+      <a href="shows.html" data-i18n="nav_shows">Shows</a>
+      <a href="repeats.html" data-i18n="nav_repeats">Repeats</a>
+      <a href="identity.html" data-i18n="nav_identity">Archive</a>
+      <a href="about.html" data-i18n="nav_about">About</a>
+      <a href="order.html" data-i18n="nav_order">Order clip</a>
+    </nav>
 
-    <a class="hero-scroll" href="#live" aria-label="Scroll down">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polyline points="5 8 12 15 19 8"></polyline>
-        <polyline points="5 14 12 21 19 14"></polyline>
-      </svg>
-    </a>
-  </section>
-
-  <div class="page">
-
-    <section id="live" style="padding:24px 18px 0">
+    <section style="padding:18px 18px 0">
       <!-- Responsive video wrapper -->
       <div class="video-frame">
         <iframe
           src="https://live.vkvideo.ru/app/embed/btvrestored"
           allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
           allowfullscreen="true"
-          loading="lazy"
+          loading="eager"
           referrerpolicy="strict-origin-when-cross-origin"
           scrolling="no">
         </iframe>
@@ -136,22 +373,22 @@
           <span data-i18n="msg_title">Написать на экран</span>
         </div>
 
-        <div class="msg-row" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
-          <div class="msg-f msg-f--text" style="flex:2;min-width:180px;">
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
+          <div style="flex:2;min-width:180px;">
             <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;" data-i18n="msg_label_text">Сообщение</label>
             <input id="msgText" type="text" maxlength="120"
               style="width:100%;padding:9px 11px;border:1px solid #ddd;border-radius:4px;font-size:14px;font-family:inherit;outline:none;"
               data-i18n-placeholder="msg_placeholder"
               placeholder="Ваше сообщение…">
           </div>
-          <div class="msg-f msg-f--name" style="flex:1;min-width:120px;">
+          <div style="flex:1;min-width:120px;">
             <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;" data-i18n="msg_label_name">Имя</label>
             <input id="msgUser" type="text" maxlength="32"
               style="width:100%;padding:9px 11px;border:1px solid #ddd;border-radius:4px;font-size:14px;font-family:inherit;outline:none;"
               data-i18n-placeholder="msg_placeholder_name"
               placeholder="Ваше имя">
           </div>
-          <div class="msg-f msg-f--type" style="flex:0 0 auto;">
+          <div style="flex:0 0 auto;">
             <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;" data-i18n="msg_label_type">Тип</label>
             <select id="msgType"
               style="padding:9px 11px;border:1px solid #ddd;border-radius:4px;font-size:14px;font-family:inherit;background:#fff;outline:none;cursor:pointer;">
@@ -161,7 +398,7 @@
               <option value="express">⚡ Express</option>
             </select>
           </div>
-          <div class="msg-f msg-f--btn" style="flex:0 0 auto;">
+          <div style="flex:0 0 auto;">
             <button id="msgBtn" onclick="submitMsg()"
               style="padding:9px 22px;background:var(--orange);color:#fff;border:none;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s;"
               data-i18n="msg_send">Отправить</button>
@@ -181,33 +418,6 @@
       </div>
     </section>
 
-
-    <!-- Наши проекты -->
-    <section class="projects">
-      <h2 class="projects-title" data-i18n="projects_title">Our projects</h2>
-      <div class="projects-grid">
-
-        <a class="proj proj-btv" href="#live">
-          <span class="proj-badge proj-badge--live" data-i18n="badge_live">On air</span>
-          <div class="proj-body">
-            <img class="proj-logo" src="logo.png" alt="BRIDGE TV" onerror="this.style.display='none'">
-            <h3>BRIDGE TV Project Restored</h3>
-            <p data-i18n="proj_btv_text">Live now: archive broadcasts, classic clips and new music in the spirit of the original channel.</p>
-          </div>
-        </a>
-
-        <a class="proj proj-rusong" href="https://t.me/+-7w04rv_6K02MWQy" target="_blank" rel="noopener">
-          <span class="proj-badge" data-i18n="badge_soon">Coming soon</span>
-          <div class="proj-body">
-            <img class="proj-logo" src="rusong-logo.png" alt="RUSONG TV" onerror="this.style.display='none'">
-            <h3>RUSONG TV Project Restored</h3>
-            <p data-i18n="proj_rus_text">The Russian-language music channel is coming back. Follow the news on Telegram.</p>
-            <span class="proj-link" data-i18n="proj_rus_btn">Follow on Telegram</span>
-          </div>
-        </a>
-
-      </div>
-    </section>
 
     <footer>
       <span data-i18n="footer">Presented by BM-PR. Not affiated with BRIDGE MEDIA.</span>
@@ -383,13 +593,6 @@
         nav_identity:        'Archive',
         nav_about:           'About',
         nav_order:           'Order clip',
-        hero_tagline:        'The alternative music channel is back on air',
-        projects_title:      'Our projects',
-        badge_live:          'On air',
-        badge_soon:          'Coming soon',
-        proj_btv_text:       'Live now: archive broadcasts, classic clips and new music in the spirit of the original channel.',
-        proj_rus_text:       'The Russian-language music channel is coming back. Follow the news on Telegram.',
-        proj_rus_btn:        'Follow on Telegram',
         footer:              'Presented by BM-PR. Not affiated with BRIDGE MEDIA.',
         history_title:       'Today in BRIDGE TV history',
         msg_title:           'Write on screen',
@@ -409,13 +612,6 @@
         nav_identity:        '\u0410\u0440\u0445\u0438\u0432',
         nav_about:           '\u041e \u0442\u0435\u043b\u0435\u043a\u0430\u043d\u0430\u043b\u0435',
         nav_order:           '\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u043a\u043b\u0438\u043f',
-        hero_tagline:        '\u0410\u043b\u044c\u0442\u0435\u0440\u043d\u0430\u0442\u0438\u0432\u043d\u044b\u0439 \u043c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0439 \u043a\u0430\u043d\u0430\u043b \u0441\u043d\u043e\u0432\u0430 \u0432 \u044d\u0444\u0438\u0440\u0435',
-        projects_title:      'Наши проекты',
-        badge_live:          'В эфире',
-        badge_soon:          'Скоро',
-        proj_btv_text:       'Сейчас в эфире: архивные записи, классические клипы и новая музыка в духе оригинального канала.',
-        proj_rus_text:       'Русскоязычный музыкальный канал возвращается. Следите за новостями в Telegram.',
-        proj_rus_btn:        'Следить в Telegram',
         footer:              '\u041f\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u043e \u043a\u043e\u043c\u0430\u043d\u0434\u043e\u0439 BM-PR.',
         history_title:       '\u0421\u0435\u0433\u043e\u0434\u043d\u044f \u0432 \u0438\u0441\u0442\u043e\u0440\u0438\u0438 BRIDGE TV',
         msg_title:           '\u041d\u0430\u043f\u0438\u0441\u0430\u0442\u044c \u043d\u0430 \u044d\u043a\u0440\u0430\u043d',

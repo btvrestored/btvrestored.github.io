@@ -3,56 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070707">
   <title>Заказать клип - BRIDGE TV Project Restored</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&subset=cyrillic,latin&display=swap" rel="stylesheet">
-  <style>
-    :root{--black:#070707;--orange:#ff6a00;--blue:#235fa8;--line:#e6e6e6}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Roboto,Arial,sans-serif;background:linear-gradient(180deg,#fbfbfb,#d8d8d8);color:#222}
-    a{color:inherit;text-decoration:none}
-    .page{width:min(900px,calc(100% - 24px));margin:14px auto 24px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.06)}
-    header{background:var(--black);padding:18px 22px;display:flex;justify-content:space-between;gap:16px;align-items:center}
-    .logo img{height:48px}
-    .lang{color:#fff;display:flex;align-items:center;gap:6px;font-size:14px}
-    .lang-btn{background:none;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:3px;padding:2px 8px;font-size:13px;cursor:pointer;opacity:.7}
-    .lang-btn.active{opacity:1;border-color:#fff;font-weight:700}
-    nav{display:flex;justify-content:center;gap:32px;padding:16px 14px 15px;border-bottom:1px solid #ededed;font-size:16px;flex-wrap:wrap}
-    nav a.active{color:var(--orange);font-weight:700}
-    main{padding:34px 28px 42px}
-    h1{margin:0 0 10px;font-size:32px;font-weight:900;letter-spacing:-.5px}
-    p{line-height:1.5;color:#555}
-    .panel{margin-top:22px;border:1px solid var(--line);border-radius:6px;padding:22px;background:#f8f8f8}
-    .bot{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
-    .avatar{width:58px;height:58px;border-radius:8px;background:linear-gradient(135deg,#2aabee,#1f7fc0);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:24px}
-    .name{font-weight:900;font-size:20px}
-    .hint{color:#777;font-size:14px;margin-top:4px}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
-    .btn{display:inline-block;border-radius:4px;padding:11px 16px;font-weight:700}
-    .primary{background:var(--orange);color:#fff;box-shadow:0 2px 0 rgba(0,0,0,.16)}
-    .secondary{border:1px solid var(--line);color:var(--blue);background:#fff}
-    .rules{margin-top:22px}
-    .rules li{margin:7px 0;color:#555}
-    footer{padding:16px 18px 22px;color:#777;font-size:13px;border-top:1px solid #eee}
-  </style>
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="inner.css">
 </head>
-<body>
-  <div class="page">
-    <header>
-      <a class="logo" href="index.html"><img src="logo.png" alt="BRIDGE TV"></a>
-      <div class="lang">language:
+<body class="inner page-order">
+  <header class="site-header">
+    <div class="logo">
+      <a href="index.html">
+        <img src="logo.png" alt="BRIDGE TV" height="48">
+      </a>
+    </div>
+    <nav>
+        <a href="shows.html" data-i18n="nav_shows">Shows</a>
+        <a href="repeats.html" data-i18n="nav_repeats">Repeats</a>
+        <a href="identity.html" data-i18n="nav_identity">Archive</a>
+        <a href="about.html" data-i18n="nav_about">About</a>
+        <a href="order.html" class="active" data-i18n="nav_order">Order clip</a>
+    </nav>
+    <div class="top-right">
+      <div class="lang">
+        language:
         <button class="lang-btn active" onclick="setLang('en')">🇬🇧 EN</button>
         <button class="lang-btn" onclick="setLang('ru')">🇷🇺 RU</button>
       </div>
-    </header>
-    <nav>
-      <a href="shows.html" data-i18n="nav_shows">Программы</a>
-      <a href="repeats.html" data-i18n="nav_repeats">Повторы</a>
-      <a href="identity.html" data-i18n="nav_identity">Архив</a>
-      <a href="about.html" data-i18n="nav_about">О телеканале</a>
-      <a class="active" href="order.html" data-i18n="nav_order">Заказать клип</a>
-    </nav>
-    <main>
+    </div>
+  </header>
+
+  <main class="inner-main">
       <h1 data-i18n="title">Заказать клип или предложить трек</h1>
       <p data-i18n="intro">Для музыкальных заявок используйте Telegram-бота BM-PR. Так запрос не потеряется и его проще обработать перед эфиром.</p>
       <section class="panel">
@@ -73,9 +56,9 @@
           <li data-i18n="r3">Заявка не гарантирует мгновенный показ, но помогает собрать ротацию.</li>
         </ul>
       </section>
-    </main>
-    <footer data-i18n="footer">Presented by BM-PR. Not affiliated with BRIDGE MEDIA.</footer>
-  </div>
+  </main>
+
+  <footer class="site-footer" data-i18n="footer">Presented by BM-PR. Not affiliated with BRIDGE MEDIA.</footer>
   <script>
     const i18n = {
       en: {

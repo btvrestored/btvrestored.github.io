@@ -1,0 +1,596 @@
+/* ===== BRIDGE TV — Project Restored: внутренние страницы (shows, about, ...) ===== */
+:root{
+  --black:#070707;
+  --orange:#ff6a00;
+  --orange2:#ff8a2d;
+  --line:rgba(255,255,255,.14);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body.inner{
+  margin:0;
+  min-height:100vh;
+  font-family:'Gotham Pro', Roboto, Arial, Helvetica, sans-serif;
+  background:#0b0b0b;
+  color:#fff;
+}
+a{color:inherit;text-decoration:none}
+
+/* Фон страницы: положите bg.jpg рядом (например, кадр из hero.mp4).
+   Если файла нет — просто тёмный градиент. */
+body.inner::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  background:
+    radial-gradient(1100px 560px at 85% 105%, rgba(255,106,0,.20), transparent 62%),
+    linear-gradient(180deg, rgba(7,7,7,.72) 0%, rgba(7,7,7,.86) 100%),
+    url("bg.jpg") center / cover no-repeat,
+    #0b0b0b;
+}
+
+/* ---------- Шапка (липкая, с размытием) ---------- */
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  display:flex;
+  align-items:center;
+  gap:32px;
+  padding:16px max(24px, calc((100% - 1180px) / 2));
+  background:rgba(7,7,7,.55);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.logo{display:flex;align-items:center;flex:0 0 auto}
+.logo img{display:block;height:40px;width:auto}
+.site-header nav{
+  display:flex;
+  gap:30px;
+  margin-left:auto;
+  font-size:15px;
+  font-weight:500;
+}
+.site-header nav a{
+  color:#fff;
+  padding:6px 0;
+  border-bottom:2px solid transparent;
+  transition:border-color .15s;
+}
+.site-header nav a:hover{border-color:rgba(255,106,0,.6)}
+.site-header nav a.active{border-color:var(--orange);font-weight:700}
+.top-right{flex:0 0 auto;font-size:13px;line-height:1.7;text-align:right}
+.top-right .lang{display:flex;align-items:center;justify-content:flex-end;gap:6px;opacity:.95}
+.lang-btn{
+  background:rgba(0,0,0,.25);
+  border:1px solid rgba(255,255,255,.35);
+  color:#fff;
+  border-radius:4px;
+  padding:3px 9px;
+  font-size:13px;
+  font-family:inherit;
+  cursor:pointer;
+  opacity:.75;
+  transition:opacity .15s, background .15s;
+}
+.lang-btn:hover{opacity:1}
+.lang-btn.active{opacity:1;border-color:#fff;font-weight:700;background:rgba(255,255,255,.14)}
+
+/* ---------- Контент ---------- */
+.inner-main{
+  width:min(1180px, calc(100% - 48px));
+  margin:0 auto;
+  padding:56px 0 72px;
+}
+.inner-main h1{
+  margin:0 0 8px;
+  font-size:clamp(30px, 4.6vw, 56px);
+  font-weight:900;
+  line-height:1.1;
+  letter-spacing:-.5px;
+  text-shadow:0 2px 20px rgba(0,0,0,.4);
+}
+.inner-main h1 span{color:var(--orange)}
+.subtitle{
+  margin:0 0 36px;
+  font-size:17px;
+  color:rgba(255,255,255,.7);
+}
+
+/* ---------- SHOWS ---------- */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:24px;
+}
+.card{
+  display:flex;
+  flex-direction:column;
+  background:rgba(8,8,8,.52);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow:hidden;
+  transition:transform .2s, border-color .2s, box-shadow .2s;
+}
+.card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(255,106,0,.55);
+  box-shadow:0 14px 34px rgba(0,0,0,.4);
+}
+.card-thumb{
+  height:170px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+}
+.card-thumb img{transition:transform .5s}
+.card:hover .card-thumb img{transform:scale(1.05)}
+.card-body{padding:16px 18px 20px;display:flex;flex-direction:column;flex:1}
+.card-title{
+  margin:0 0 6px;
+  font-size:19px;
+  font-weight:900;
+  letter-spacing:-.3px;
+  color:#fff;
+}
+.card-age{
+  align-self:flex-start;
+  margin:0 0 12px;
+  padding:1px 8px;
+  font-size:12px;
+  color:rgba(255,255,255,.75);
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:20px;
+}
+.card-desc{
+  margin:0;
+  font-size:14px;
+  line-height:1.6;
+  color:rgba(255,255,255,.82);
+}
+.card-airtime{
+  margin:auto 0 0;
+  padding-top:12px;
+  border-top:1px solid var(--line);
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:var(--orange2);
+}
+.card-desc + .card-airtime{margin-top:14px}
+
+/* градиенты-заглушки, пока нет картинки */
+.c-baby     { background: linear-gradient(135deg,#ffecd2,#fcb69f); }
+.c-intime   { background: linear-gradient(135deg,#a18cd1,#fbc2eb); }
+.c-nightlife{ background: linear-gradient(135deg,#0f0c29,#302b63,#24243e); color:#fff; }
+.c-rock     { background: linear-gradient(135deg,#1a1a2e,#e94560); color:#fff; }
+.c-retro    { background: linear-gradient(135deg,#f7971e,#ffd200); }
+.c-top10    { background: linear-gradient(135deg,#43cea2,#185a9d); color:#fff; }
+.c-news     { background: linear-gradient(135deg,#bdc3c7,#2c3e50); color:#fff; }
+.c-wake     { background: linear-gradient(135deg,#f9d423,#ff4e50); }
+.c-lounge   { background: linear-gradient(135deg,#c9d6df,#f0f2f0); }
+
+/* ---------- ABOUT ---------- */
+.about{max-width:820px}
+.about p{
+  margin:0 0 18px;
+  font-size:17px;
+  line-height:1.75;
+  color:rgba(255,255,255,.9);
+}
+.about p.subtitle{margin:0 0 32px;font-size:17px;color:rgba(255,255,255,.7)}
+.about h2{
+  margin:0 0 14px;
+  font-size:26px;
+  font-weight:900;
+  letter-spacing:-.3px;
+}
+.divider{
+  border:none;
+  border-top:3px solid var(--orange);
+  width:56px;
+  margin:34px 0;
+}
+.social-links{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}
+.social-link{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:11px 22px;
+  border-radius:6px;
+  font-size:15px;
+  font-weight:700;
+  transition:transform .15s, opacity .15s;
+}
+.social-link:hover{opacity:.9;transform:translateY(-2px)}
+.social-link.tg{background:#229ED9;color:#fff}
+.social-link.vk{background:#0077FF;color:#fff}
+.social-link svg{width:20px;height:20px;fill:#fff;flex-shrink:0}
+
+/* ---------- Подвал ---------- */
+.site-footer{
+  width:min(1180px, calc(100% - 48px));
+  margin:0 auto;
+  padding:22px 0 30px;
+  border-top:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.6);
+  font-size:13px;
+}
+
+/* ---------- Адаптив ---------- */
+@media (min-width:861px) and (max-width:1000px){
+  .grid{grid-template-columns:repeat(2, 1fr)}
+}
+@media (max-width:860px){
+  .site-header{flex-wrap:wrap;gap:10px 16px;padding:12px 18px;position:static}
+  .logo img{height:34px}
+  .top-right{margin-left:auto}
+  .site-header nav{order:3;width:100%;margin-left:0;gap:6px 20px;flex-wrap:wrap;font-size:14px}
+  .inner-main{width:calc(100% - 36px);padding:32px 0 48px}
+  .site-footer{width:calc(100% - 36px)}
+  .grid{grid-template-columns:1fr}
+  .card-thumb{height:190px}
+  .about p{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .card,.card-thumb img,.social-link,.asset,.btn{transition:none}
+  .card:hover{transform:none}
+  .card:hover .card-thumb img{transform:none}
+}
+
+/* ---------- Общие дополнения для остальных страниц ---------- */
+.inner-main p{color:rgba(255,255,255,.82);line-height:1.6}
+.inner-main p.subtitle{color:rgba(255,255,255,.7)}
+
+/* ---------- IDENTITY (Архив) ---------- */
+.asset{
+  background:rgba(8,8,8,.52);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow:hidden;
+  transition:transform .2s, border-color .2s, box-shadow .2s;
+}
+.asset:hover{transform:translateY(-4px);border-color:rgba(255,106,0,.55);box-shadow:0 14px 34px rgba(0,0,0,.4)}
+.jpg-slot{
+  height:170px;
+  background:linear-gradient(135deg,#1a1a1a,#3a3a3a);
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  color:#fff;font-weight:900;letter-spacing:.04em;padding:18px;position:relative;
+}
+.jpg-slot::after{
+  content:attr(data-file);
+  position:absolute;left:12px;right:12px;bottom:9px;
+  color:rgba(255,255,255,.55);font-size:11px;font-weight:500;letter-spacing:0;
+}
+.asset-body{padding:16px 18px 20px}
+.asset-body h2{margin:0 0 8px;font-size:19px;font-weight:900;letter-spacing:-.3px;color:#fff}
+.asset-body p{margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.78)}
+.note{
+  margin-top:28px;
+  padding:16px 18px;
+  border:1px dashed rgba(255,255,255,.25);
+  border-radius:10px;
+  background:rgba(8,8,8,.4);
+  color:rgba(255,255,255,.75);
+  line-height:1.6;
+}
+
+/* ---------- REPEATS (Повторы) ---------- */
+.page-repeats .grid{grid-template-columns:repeat(2, 1fr)}
+.vk-link{
+  display:inline-flex;
+  margin-bottom:28px;
+  padding:11px 18px;
+  background:var(--orange);
+  color:#fff;
+  font-weight:700;
+  border-radius:6px;
+  box-shadow:0 2px 0 rgba(0,0,0,.16);
+  transition:background .15s;
+}
+.vk-link:hover{background:var(--orange2)}
+.repeat{
+  background:rgba(8,8,8,.52);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow:hidden;
+}
+.player-slot{
+  position:relative;
+  aspect-ratio:16/9;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  padding:18px;
+  background:#050505;
+  color:#ddd;
+}
+.player-slot span{max-width:320px;line-height:1.5;color:rgba(255,255,255,.75)}
+.player-slot::after{
+  content:attr(data-src);
+  position:absolute;left:12px;right:12px;bottom:9px;
+  color:rgba(255,255,255,.4);font-size:11px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.player-slot iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.repeat-body{padding:16px 18px 20px}
+.repeat-body h2{margin:0 0 8px;font-size:19px;font-weight:900;letter-spacing:-.3px;color:#fff}
+.repeat-body p{margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.78)}
+
+/* ---------- ORDER (Заказать клип) ---------- */
+.page-order .panel,
+.page-order .inner-main > p{max-width:820px}
+.panel{
+  margin-top:26px;
+  padding:26px;
+  background:rgba(8,8,8,.52);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  border:1px solid var(--line);
+  border-radius:12px;
+}
+.bot{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.avatar{
+  width:60px;height:60px;border-radius:12px;
+  background:linear-gradient(135deg,#2aabee,#1f7fc0);
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:24px;
+}
+.name{font-weight:900;font-size:22px;color:#fff}
+.hint{margin-top:4px;font-size:14px;color:rgba(255,255,255,.65)}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.btn{
+  display:inline-block;
+  padding:12px 20px;
+  font-weight:700;
+  border-radius:6px;
+  transition:background .15s, transform .15s;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn.primary{background:var(--orange);color:#fff;box-shadow:0 2px 0 rgba(0,0,0,.16)}
+.btn.primary:hover{background:var(--orange2)}
+.btn.secondary{color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.3)}
+.btn.secondary:hover{background:rgba(255,255,255,.16)}
+.rules{margin:24px 0 0;padding-left:20px}
+.rules li{margin:8px 0;color:rgba(255,255,255,.82);line-height:1.55}
+
+@media (max-width:860px){
+  .page-repeats .grid{grid-template-columns:1fr}
+  .panel{padding:20px}
+}
+
+/* ======================================================
+   ABOUT — страница в стиле «карточка канала» (rtgtv.ru)
+   ====================================================== */
+/* задник: фото + затемнение, к низу теплеет (положите about-bg.jpg рядом) */
+body.inner.page-about::before{
+  background:
+    linear-gradient(180deg, rgba(7,7,7,.76) 0%, rgba(7,7,7,.66) 40%, rgba(95,20,0,.74) 100%),
+    url("about-bg.jpg") center / cover no-repeat,
+    #0b0b0b;
+}
+/* шапка прозрачная и не липнет, как на rtgtv.ru */
+.page-about .site-header{
+  position:absolute;
+  left:0; right:0;
+  background:transparent;
+  border-bottom:0;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+}
+.page-about .site-header nav a{text-shadow:0 1px 8px rgba(0,0,0,.5)}
+
+.channel{
+  width:min(1180px, calc(100% - 48px));
+  margin:0 auto;
+  padding:150px 0 72px;
+}
+.channel-logo{margin:0;line-height:0}
+.channel-logo img{display:block;height:76px;width:auto;max-width:100%}
+.channel-tag{
+  margin:14px 0 0;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.75);
+}
+.channel-grid{
+  display:grid;
+  grid-template-columns:260px minmax(0, 780px);
+  gap:24px 64px;
+  margin-top:72px;
+  align-items:start;
+}
+
+/* левая колонка: «подпись — значение» */
+.facts{margin:0;position:sticky;top:28px}
+.facts > div{margin:0 0 20px}
+.facts dt{
+  font-size:15px;
+  font-weight:300;
+  line-height:1.5;
+  color:rgba(255,255,255,.65);
+}
+.facts dd{
+  margin:0;
+  font-size:17px;
+  font-weight:500;
+  line-height:1.45;
+  color:#fff;
+}
+
+/* правая колонка: текст */
+.channel-text p{
+  margin:0 0 20px;
+  font-size:17px;
+  line-height:1.7;
+  color:rgba(255,255,255,.94);
+  text-shadow:0 1px 10px rgba(0,0,0,.35);
+}
+.channel-text h2{
+  margin:0 0 14px;
+  font-size:26px;
+  font-weight:900;
+  letter-spacing:-.3px;
+}
+.channel-text .divider{margin:36px 0}
+
+/* текстовая ссылка в тексте */
+.text-link{
+  display:inline-block;
+  margin:2px 0 4px;
+  font-weight:700;
+  color:#fff;
+  border-bottom:2px solid var(--orange);
+  padding-bottom:2px;
+  transition:color .15s;
+}
+.text-link:hover{color:var(--orange2)}
+
+/* кнопка-«таблетка» */
+.pill{
+  display:inline-block;
+  margin-top:56px;
+  padding:18px 44px;
+  font-size:21px;
+  font-weight:500;
+  color:#fff;
+  border:2px solid #fff;
+  border-radius:999px;
+  transition:background .18s, border-color .18s, transform .18s;
+}
+.pill:hover{background:var(--orange);border-color:var(--orange);transform:translateY(-2px)}
+
+/* «листалка» внизу: ← назад / дальше → */
+.channel-switch{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:24px;
+  margin-top:72px;
+}
+.sw{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  gap:18px;
+  color:#fff;
+  font-size:20px;
+  font-weight:700;
+  transition:opacity .15s, transform .15s;
+}
+.sw:hover{opacity:.85}
+.sw-prev:hover{transform:translateX(-4px)}
+.sw-next:hover{transform:translateX(4px)}
+.sw .arrow{width:64px;height:14px;flex:0 0 auto}
+.sw img{display:block;height:34px;width:auto}
+.sw-soon{
+  position:absolute;
+  right:82px;
+  bottom:calc(100% + 6px);
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#c8f26a;
+  white-space:nowrap;
+}
+
+@media (max-width:860px){
+  .page-about .site-header{position:static}
+  .channel{width:calc(100% - 36px);padding:36px 0 48px}
+  .channel-logo img{height:56px}
+  .channel-grid{grid-template-columns:1fr;margin-top:40px}
+  .facts{position:static;display:grid;grid-template-columns:1fr 1fr;gap:0 24px}
+  .channel-text p{font-size:16px}
+  .pill{margin-top:40px;padding:15px 34px;font-size:18px}
+  .channel-switch{margin-top:48px}
+  .sw{font-size:17px;gap:12px}
+  .sw .arrow{width:40px}
+  .sw img{height:26px}
+  .sw-soon{right:52px}
+}
+@media (prefers-reduced-motion:reduce){
+  .pill,.sw{transition:none}
+  .pill:hover,.sw-prev:hover,.sw-next:hover{transform:none}
+}
+
+/* ======================================================
+   ТЕЛЕФОНЫ
+   ====================================================== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+a,button,select{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+
+@media (max-width:860px){
+  /* шапка: 1-я строка — логотип + язык, 2-я — меню, которое листается пальцем */
+  .logo a, .logo{min-height:44px;display:flex;align-items:center}
+  .top-right .lang{font-size:0;gap:8px}              /* прячем слово «language:» */
+  .lang-btn{
+    min-height:44px;padding:0 10px;
+    font-size:14px;
+  }
+  .site-header nav{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    gap:4px;
+    margin:0 -4px;
+    padding:0 4px;
+  }
+  .site-header nav::-webkit-scrollbar{display:none}
+  .site-header nav a{
+    flex:0 0 auto;
+    display:flex;align-items:center;
+    min-height:44px;
+    padding:0 12px;
+    white-space:nowrap;
+    border-bottom:2px solid transparent;
+  }
+}
+/* на сенсорных экранах «наведение» не должно залипать */
+@media (hover:none){
+  .card:hover,.asset:hover,.proj:hover,.pill:hover,.btn:hover,
+  .sw-prev:hover,.sw-next:hover,.social-link:hover{transform:none}
+  .card:hover .card-thumb img{transform:none}
+}
+
+@media (max-width:860px){
+  /* стекло с размытием на телефонах тормозит — делаем плотнее без blur */
+  .card,.asset,.repeat,.panel{
+    -webkit-backdrop-filter:none;backdrop-filter:none;
+    background:rgba(8,8,8,.74);
+  }
+  .site-header{-webkit-backdrop-filter:none;backdrop-filter:none}
+  .vk-link{display:flex;justify-content:center;min-height:48px;align-items:center}
+  .actions .btn{flex:1 1 100%;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center}
+  .text-link{padding:12px 0 10px}
+  .sw{min-height:48px}
+}
+@media (max-width:480px){
+  /* about: нижняя «листалка» не должна вылезать за экран */
+  .channel-switch{gap:12px;flex-wrap:wrap}
+  .sw{gap:10px;font-size:16px}
+  .sw .arrow{width:30px}
+  .sw img{height:22px;max-width:44vw}
+  .sw-soon{right:40px}
+  .channel-logo img{height:48px}
+}
+
+/* узкие ноутбуки / планшеты в альбомной ориентации (861–1000px): меню переносится на 2-ю строку */
+@media (min-width:861px) and (max-width:1000px){
+  .site-header{flex-wrap:wrap;gap:8px 20px}
+  .top-right{margin-left:auto}
+  .site-header nav{order:3;width:100%;margin-left:0;gap:28px}
+}
