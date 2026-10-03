@@ -72,7 +72,7 @@
       <div class="logo">
         <img src="logo.png" alt="BRIDGE TV" height="48">
       </div>
-      <nav>
+      <nav id="siteNav">
         <a href="shows.html" data-i18n="nav_shows">Shows</a>
         <a href="repeats.html" data-i18n="nav_repeats">Repeats</a>
         <a href="identity.html" data-i18n="nav_identity">Archive</a>
@@ -86,6 +86,7 @@
           <button class="lang-btn" onclick="setLang('ru')">🇷🇺 RU</button>
         </div>
       </div>
+    <button class="burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="siteNav"><span></span><span></span><span></span></button>
     </header>
 
     <div class="hero-content">
@@ -454,5 +455,6 @@
     var savedLang = localStorage.getItem('lang') || 'en';
     setLang(savedLang);
   </script>
+  <script src="menu.js" defer></script>
 </body>
 </html>
