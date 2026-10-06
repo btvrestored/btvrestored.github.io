@@ -1,0 +1,28 @@
+name: Update repeats
+on:
+  schedule:
+    - cron: "*/15 * * * *"      # каждые 15 минут (GitHub может задерживать запуск)
+  workflow_dispatch: {}          # ручной запуск из вкладки Actions
+permissions:
+  contents: write
+concurrency:
+  group: update-repeats
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch finished broadcasts from VK
+        env:
+          VK_TOKEN: ${{ secrets.VK_TOKEN }}
+        run: python3 scripts/update_repeats.py
+      - name: Commit if changed
+        run: |
+          if ! git diff --quiet -- repeats.json; then
+            git config user.name  "repeats-bot"
+            git config user.email "repeats-bot@users.noreply.github.com"
+            git add repeats.json
+            git commit -m "Update repeats.json"
+            git push
+          fi

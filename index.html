@@ -118,6 +118,10 @@
       </div>
       <a class="video-fallback" href="https://live.vkvideo.ru/btvrestored" target="_blank" rel="noopener" data-i18n="video_fallback">Open live video</a>
       <span class="video-note" data-i18n="video_note">If the player is blocked, use this direct link.</span>
+    <section id="nowplaying" class="nowplaying" hidden>
+      <div class="np-now"><span class="np-dot" aria-hidden="true"></span><span class="np-label" id="npLabel">Сейчас в эфире</span><strong id="npNow"></strong></div>
+      <div class="np-prev" id="npPrevWrap" hidden><span data-i18n="np_prev">Недавно играло</span><ol id="npPrev"></ol></div>
+    </section>
     </section>
 
     <!-- Viewer message form -->
@@ -400,6 +404,7 @@
         msg_send:            'Send',
         video_fallback:      'Open live video',
         video_note:          'If the player is blocked, use this direct link.',
+        np_label: 'On air now', np_prev: 'Recently played',
         msg_preview_empty:   'Preview will appear here.',
         msg_placeholder:     'Your message\u2026',
         msg_placeholder_name:'Your name'
@@ -426,6 +431,7 @@
         msg_send:            '\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c',
         video_fallback:      '\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u044d\u0444\u0438\u0440',
         video_note:          '\u0415\u0441\u043b\u0438 \u043f\u043b\u0435\u0435\u0440 \u043d\u0435 \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u043b\u0441\u044f, \u043e\u0442\u043a\u0440\u043e\u0439\u0442\u0435 \u044d\u0444\u0438\u0440 \u043f\u043e \u0441\u0441\u044b\u043b\u043a\u0435.',
+        np_label: 'Сейчас в эфире', np_prev: 'Недавно играло',
         msg_preview_empty:   '\u041f\u0440\u0435\u0434\u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440 \u043f\u043e\u044f\u0432\u0438\u0442\u0441\u044f \u0437\u0434\u0435\u0441\u044c.',
         msg_placeholder:     '\u0412\u0430\u0448\u0435 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435\u2026',
         msg_placeholder_name:'\u0412\u0430\u0448\u0435 \u0438\u043c\u044f'
@@ -456,5 +462,76 @@
     setLang(savedLang);
   </script>
   <script src="menu.js" defer></script>
+  <script>
+    /* Треклист: tracklist.json — либо {start, offset, tracks:[{t,artist,title}]} (по таймкодам, см. scripts/go_live.py),
+       либо {updated, now, history} (вручную). Виджет скрыт, если трека нет. */
+    (function () {
+      var NP_URL = 'tracklist.json', NP_EVERY = 20000, NP_STALE_MIN = 15;
+      var box = document.getElementById('nowplaying');
+      if (!box || !window.fetch) return;
+      function line(t) { return t ? ((t.artist ? t.artist + ' — ' : '') + (t.title || '')) : ''; }
+      var LANG = function () { return document.documentElement.lang === 'en' ? 'en' : 'ru'; };
+      var KIND = {
+        wait:  { ru: 'Ожидание эфира', en: 'Waiting for the broadcast', jokes: {
+          ru: ['Эфир скоро начнётся. Мы уже здесь — просто репетируем умный вид.', 'Настраиваем антенну методом «чуть левее… ещё левее…».', 'Включаем эфир. Нет, не этот провод.', 'Курьер с хорошим настроением немного задерживается.'],
+          en: ['The broadcast starts soon. We are here, just rehearsing our serious face.', 'Aiming the antenna: “a bit to the left… more to the left…”.', 'Switching on the broadcast. No, not that cable.', 'The courier with the good mood is running a bit late.'] } },
+        ad:    { ru: 'Реклама', en: 'Ad break', jokes: {
+          ru: ['Рекламная пауза: самое время налить чаю.', 'Реклама. Пульт лучше не трогать — мы скоро вернёмся.', 'Несколько слов от спонсоров, и снова музыка.'],
+          en: ['Ad break: a perfect time to make tea.', 'Ads. Leave the remote alone — we will be right back.', 'A few words from our sponsors, then back to the music.'] } },
+        promo: { ru: 'Заставки и анонсы', en: 'Idents and promos', jokes: {
+          ru: ['Заставки и анонсы: смотрим, что будет дальше.', 'Анонсы: следующий эфир уже в предвкушении.', 'Промо-ролики. У нас всё по плану (почти).'],
+          en: ['Idents and promos: a peek at what is coming next.', 'Promos: the next broadcast is already warming up.', 'Promo reel. Everything is going to plan (almost).'] } },
+        tech:  { ru: 'Технические неполадки', en: 'Technical difficulties', jokes: {
+          ru: ['А мы на север ушли, вернёмся через 10 минут.', 'Не регулируйте ваш телевизор — это мы.', 'Сигнал ушёл прогуляться. Ищем, куда.', 'Технические неполадки. Виноватый уже назначен — кажется, это кабель.'],
+          en: ['We went north — back in 10 minutes.', 'Do not adjust your TV set — it is us.', 'The signal went for a walk. We are looking for it.', 'Technical difficulties. The culprit has been chosen — probably the cable.'] } }
+      };
+      function show(label, text, hist) {
+        document.getElementById('npLabel').textContent = label;
+        document.getElementById('npNow').textContent = text;
+        var ol = document.getElementById('npPrev'); ol.innerHTML = '';
+        hist.slice(0, 5).forEach(function (t) { var li = document.createElement('li'); li.textContent = line(t); ol.appendChild(li); });
+        document.getElementById('npPrevWrap').hidden = !ol.children.length;
+        box.hidden = false;
+      }
+      function tick() {
+        fetch(NP_URL + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
+          var now = null, hist = [], countdown = null;
+          if (d && d.idle) {
+            now = { kind: 'wait', t: 0 };                       /* idle-файл в OBS: эфир ещё не начался / уже закончился */
+          } else if (d && d.start && d.tracks && d.tracks.length) {
+            /* режим «по таймкодам»: текущий трек считается от момента старта эфира */
+            var el = (Date.now() - new Date(d.start).getTime()) / 1000 - (d.offset || 0);
+            var idx = -1;
+            for (var i = 0; i < d.tracks.length; i++) { if (d.tracks[i].t <= el) idx = i; }
+            if (el < 0) {
+              now = { kind: 'wait', t: 0 }; countdown = -el;    /* старт запланирован: ждём */
+            } else if (idx >= 0) {
+              var last = d.tracks[d.tracks.length - 1].t;
+              if (d.end != null && el > d.end) now = { kind: 'wait', t: 0 };   /* эфир кончился -> снова idle */
+              else if (d.end == null && el > last + 600) now = null;          /* длительность не задана -> прячем */
+              else { now = d.tracks[idx]; hist = d.tracks.slice(0, idx).filter(function (x) { return !x.kind; }).reverse(); }
+            }
+          } else if (d && d.now && d.updated && (Date.now() - new Date(d.updated).getTime()) < NP_STALE_MIN * 60000) {
+            now = d.now; hist = d.history || [];   /* ручной режим */
+          }
+          if (!now) { box.hidden = true; return; }
+          var L = LANG();
+          if (now.kind && KIND[now.kind]) {
+            var k = KIND[now.kind], js = k.jokes[L];
+            var txt = now.text || js[Math.floor(now.t || 0) % js.length];
+            if (countdown != null) {
+              var m = Math.floor(countdown / 60), sec = Math.floor(countdown % 60);
+              txt += (L === 'en' ? '  Starts in ' : '  До начала: ') + (m >= 60 ? Math.floor(m / 60) + ':' + ('0' + m % 60).slice(-2) : m) + ':' + ('0' + sec).slice(-2);
+            }
+            show(k[L], txt, hist);
+          } else {
+            show(L === 'en' ? 'On air now' : 'Сейчас в эфире', line(now), hist);
+          }
+        }).catch(function () { box.hidden = true; });
+      }
+      tick(); setInterval(tick, NP_EVERY);
+      document.addEventListener('visibilitychange', function () { if (!document.hidden) tick(); });
+    })();
+  </script>
 </body>
 </html>
