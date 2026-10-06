@@ -56,10 +56,12 @@ def parse_edl(text, fps):
         rec_in = m.group(3)
         name = ""
         for nxt in lines[i+1:i+3]:
-            mm = re.search(r"\|M:(.*?)\s*\|D:", nxt)
-            if mm: name = mm.group(1); break
-            if not name and nxt.strip() and "|C:" not in nxt and not ev.match(nxt):
-                name = nxt.strip()
+            mm = re.search(r"^(.*?)\|C:.*?\|M:(.*?)\s*\|D:", nxt)
+            if mm:
+                note, mname = mm.group(1).strip(), mm.group(2).strip()
+                # имя маркера главное; если оно пустое или стандартное «Marker N» — берём заметку
+                name = mname if mname and not re.match(r"^Marker \d+$", mname) else (note or mname)
+                break
         if name: out.append((rec_in, name))
     return out
 
