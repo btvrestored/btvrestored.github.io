@@ -10,7 +10,19 @@
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="fonts.css">
-  <link rel="stylesheet" href="inner.css">
+  <link rel="stylesheet" href="inner.css?v=20261015">
+  <style>
+    /* Стили страницы «Архив» — здесь же, чтобы страница работала при любой версии inner.css */
+    .identity-video{margin:0 0 34px}
+    .identity-video h2,.section-h{margin:0 0 14px;font-size:22px;font-weight:900;letter-spacing:-.3px;color:#fff}
+    .section-h{margin-top:8px}
+    .video-box{position:relative;width:100%;max-width:960px;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.14)}
+    .video-box iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+    .page-identity .asset .shot{display:block;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden}
+    .page-identity .asset .shot img{display:block;width:100%;height:100%;max-width:100%;object-fit:contain;transition:transform .4s}
+    .page-identity .asset:hover .shot img{transform:scale(1.03)}
+    @media (prefers-reduced-motion:reduce){.page-identity .asset .shot img{transition:none}}
+  </style>
 </head>
 <body class="inner page-identity">
   <header class="site-header">
@@ -48,105 +60,105 @@
       <h2 class="section-h" data-i18n="shots_title">Кадры из эфира</h2>
       <section class="grid">
         <article class="asset">
-          <a class="shot" href="archive/retro-dance.jpg" target="_blank" rel="noopener"><img src="archive/retro-dance.jpg" alt="Retro Dance" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/retro-dance.jpg" target="_blank" rel="noopener"><img src="archive/retro-dance.jpg" alt="Retro Dance" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a1_title">Retro Dance</h2>
             <p data-i18n="a1_desc">Заставка программы с логотипом BRIDGE TV в углу.</p>
           </div>
         </article>
         <article class="asset">
-          <a class="shot" href="archive/lights-ident.jpg" target="_blank" rel="noopener"><img src="archive/lights-ident.jpg" alt="Лампочная заставка" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/lights-ident.jpg" target="_blank" rel="noopener"><img src="archive/lights-ident.jpg" alt="Лампочная заставка" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a2_title">Лампочная заставка</h2>
             <p data-i18n="a2_desc">Заставка BRIDGE TV из светящихся ламп.</p>
           </div>
         </article>
         <article class="asset">
-          <a class="shot" href="archive/news-ticker.jpg" target="_blank" rel="noopener"><img src="archive/news-ticker.jpg" alt="Новости в эфире" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/news-ticker.jpg" target="_blank" rel="noopener"><img src="archive/news-ticker.jpg" alt="Новости в эфире" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a3_title">Новости в эфире</h2>
             <p data-i18n="a3_desc">Клип с новостной плашкой и адресом сайта канала.</p>
           </div>
         </article>
         <article class="asset">
-          <a class="shot" href="archive/reboot-north.jpg" target="_blank" rel="noopener"><img src="archive/reboot-north.jpg" alt="«Перезагрузка»" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/reboot-north.jpg" target="_blank" rel="noopener"><img src="archive/reboot-north.jpg" alt="«Перезагрузка»" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a4_title">«Перезагрузка»</h2>
             <p data-i18n="a4_desc">Экран «А мы ушли на север — в течение 10 минут вернёмся» с SMS-чатом и подписью диджея.</p>
           </div>
         </article>
         <article class="asset">
-          <a class="shot" href="archive/clip-bug.jpg" target="_blank" rel="noopener"><img src="archive/clip-bug.jpg" alt="Клип в эфире" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/clip-bug.jpg" target="_blank" rel="noopener"><img src="archive/clip-bug.jpg" alt="Клип в эфире" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a5_title">Клип в эфире</h2>
             <p data-i18n="a5_desc">Кадр клипа с логотипом BRIDGE TV в углу экрана.</p>
           </div>
         </article>
         <article class="asset">
-          <a class="shot" href="archive/exclusive.jpg" target="_blank" rel="noopener"><img src="archive/exclusive.jpg" alt="Exclusive on BRIDGE TV" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/exclusive.jpg" target="_blank" rel="noopener"><img src="archive/exclusive.jpg" alt="Exclusive on BRIDGE TV" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a6_title">Exclusive on BRIDGE TV</h2>
             <p data-i18n="a6_desc">Плашка эксклюзивной премьеры клипов.</p>
           </div>
         </article>
         <article class="asset">
-          <a class="shot" href="archive/nightlife-chat.jpg" target="_blank" rel="noopener"><img src="archive/nightlife-chat.jpg" alt="Bridge to Nightlife" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/nightlife-chat.jpg" target="_blank" rel="noopener"><img src="archive/nightlife-chat.jpg" alt="Bridge to Nightlife" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a7_title">Bridge to Nightlife</h2>
             <p data-i18n="a7_desc">Клубный блок с SMS-чатом на экране.</p>
           </div>
         </article>
         <article class="asset">
-          <a class="shot" href="archive/news-time.jpg" target="_blank" rel="noopener"><img src="archive/news-time.jpg" alt="News Time" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/news-time.jpg" target="_blank" rel="noopener"><img src="archive/news-time.jpg" alt="News Time" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a8_title">News Time</h2>
             <p data-i18n="a8_desc">Музыкальные новости: ведущий с микрофоном BRIDGE TV.</p>
           </div>
         </article>
         <article class="asset">
-          <a class="shot" href="archive/purple-ident.jpg" target="_blank" rel="noopener"><img src="archive/purple-ident.jpg" alt="Фиолетовая заставка" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/purple-ident.jpg" target="_blank" rel="noopener"><img src="archive/purple-ident.jpg" alt="Фиолетовая заставка" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a9_title">Фиолетовая заставка</h2>
             <p data-i18n="a9_desc">Заставка с городом на фиолетовом фоне.</p>
           </div>
         </article>
         <article class="asset">
-          <a class="shot" href="archive/ad-ident.jpg" target="_blank" rel="noopener"><img src="archive/ad-ident.jpg" alt="Реклама на канале" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/ad-ident.jpg" target="_blank" rel="noopener"><img src="archive/ad-ident.jpg" alt="Реклама на канале" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a10_title">Реклама на канале</h2>
             <p data-i18n="a10_desc">Заставка рекламного блока с телефоном отдела рекламы (запись с видеокассеты).</p>
           </div>
         </article>
         <article class="asset">
-          <a class="shot" href="archive/sms-chat.jpg" target="_blank" rel="noopener"><img src="archive/sms-chat.jpg" alt="SMS-чат" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/sms-chat.jpg" target="_blank" rel="noopener"><img src="archive/sms-chat.jpg" alt="SMS-чат" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a11_title">SMS-чат</h2>
             <p data-i18n="a11_desc">Сообщения зрителей и подписи диджеев поверх клипа.</p>
           </div>
         </article>
         <article class="asset">
-          <a class="shot" href="archive/logo-music-channel.jpg" target="_blank" rel="noopener"><img src="archive/logo-music-channel.jpg" alt="Логотип «Музыкальный телеканал»" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/logo-music-channel.jpg" target="_blank" rel="noopener"><img src="archive/logo-music-channel.jpg" alt="Логотип «Музыкальный телеканал»" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a12_title">Логотип «Музыкальный телеканал»</h2>
             <p data-i18n="a12_desc">Логотип BRIDGE TV с подписью «Музыкальный телеканал» и коллажем из артистов.</p>
           </div>
         </article>
         <article class="asset">
-          <a class="shot" href="archive/blue-ident.jpg" target="_blank" rel="noopener"><img src="archive/blue-ident.jpg" alt="Голубая заставка" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/blue-ident.jpg" target="_blank" rel="noopener"><img src="archive/blue-ident.jpg" alt="Голубая заставка" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a13_title">Голубая заставка</h2>
             <p data-i18n="a13_desc">Заставка с логотипом BRIDGE TV и адресом сайта.</p>
           </div>
         </article>
         <article class="asset">
-          <a class="shot" href="archive/robots-ident.jpg" target="_blank" rel="noopener"><img src="archive/robots-ident.jpg" alt="Заставка с роботами" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/robots-ident.jpg" target="_blank" rel="noopener"><img src="archive/robots-ident.jpg" alt="Заставка с роботами" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a14_title">Заставка с роботами</h2>
             <p data-i18n="a14_desc">Двое роботов на фоне логотипа BRIDGE TV.</p>
           </div>
         </article>
         <article class="asset">
-          <a class="shot" href="archive/top10.jpg" target="_blank" rel="noopener"><img src="archive/top10.jpg" alt="BRIDGE TV TOP 10" loading="lazy" decoding="async"></a>
+          <a class="shot" href="archive/top10.jpg" target="_blank" rel="noopener"><img src="archive/top10.jpg" alt="BRIDGE TV TOP 10" loading="lazy" decoding="async" width="1280" height="720"></a>
           <div class="asset-body">
             <h2 data-i18n="a15_title">BRIDGE TV TOP 10</h2>
             <p data-i18n="a15_desc">Кадр хит-парада с плашкой «Размещение рекламы».</p>
