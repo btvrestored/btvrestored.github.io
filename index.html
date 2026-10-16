@@ -179,13 +179,6 @@
       </div>
     </section>
 
-    <section class="history-today">
-      <div class="history-card">
-        <h2 data-i18n="history_title">Today in BRIDGE TV history</h2>
-        <p id="historyText">BRIDGE TV launched on June 1, 2005 and built its own alternative music universe around shows, SMS chat and rare music videos.</p>
-      </div>
-    </section>
-
 
     <!-- Наши проекты -->
     <section class="projects">
@@ -215,7 +208,7 @@
     </section>
 
     <footer>
-      <span data-i18n="footer">Presented by BM-PR. Not affiated with BRIDGE MEDIA.</span>
+      <span data-i18n="footer">Представлено командой BM-PR. Не имеет отношения к BRIDGE MEDIA.</span>
     </footer>
   </div>
 
@@ -292,7 +285,6 @@
       document.getElementById('msgUser').addEventListener('input', updatePreview);
       document.getElementById('msgType').addEventListener('change', updatePreview);
       updatePreview();
-      renderTodayHistory();
       watchRequestStatus(localStorage.getItem(VIEWER_REQUEST_KEY));
       updateCooldownButton();
     });
@@ -336,16 +328,6 @@
         box.textContent = (curLang === 'ru' ? '\u0421\u0442\u0430\u0442\u0443\u0441 \u0437\u0430\u044f\u0432\u043a\u0438: ' : 'Request status: ') + (labels[status] || labels.pending);
         box.classList.add('visible');
       });
-    }
-
-    function renderTodayHistory() {
-      const items = [
-        '\u0412 2005 \u0433\u043e\u0434\u0443 BRIDGE TV \u0432\u044b\u0448\u0435\u043b \u0432 \u044d\u0444\u0438\u0440 \u0438 \u0441\u0442\u0430\u043b \u0430\u043b\u044c\u0442\u0435\u0440\u043d\u0430\u0442\u0438\u0432\u043e\u0439 \u0434\u043b\u044f \u043c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u044b\u0445 \u043a\u0430\u043d\u0430\u043b\u043e\u0432 \u0442\u043e\u0433\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438.',
-        '\u0412 \u044d\u0444\u0438\u0440\u0435 BRIDGE TV \u0440\u0430\u043d\u044c\u0448\u0435 \u0436\u0438\u043b\u0438 SMS-\u0447\u0430\u0442, \u0437\u0430\u043a\u0430\u0437\u044b \u043a\u043b\u0438\u043f\u043e\u0432 \u0438 \u0444\u0438\u0440\u043c\u0435\u043d\u043d\u044b\u0435 \u043d\u043e\u0447\u043d\u044b\u0435 \u0431\u043b\u043e\u043a\u0438.',
-        'Bridge in Time, Baby Time, Rock Party Time \u0438 Top 10 \u0441\u043e\u0431\u0438\u0440\u0430\u043b\u0438 \u0432\u043e\u043a\u0440\u0443\u0433 \u043a\u0430\u043d\u0430\u043b\u0430 \u0436\u0438\u0432\u0443\u044e \u0430\u0443\u0434\u0438\u0442\u043e\u0440\u0438\u044e.'
-      ];
-      const el = document.getElementById('historyText');
-      if (el) el.textContent = items[new Date().getDate() % items.length];
     }
 
     function getCooldownRemaining() {
@@ -395,8 +377,7 @@
         proj_btv_text:       'Live now: archive broadcasts, classic clips and new music in the spirit of the original channel.',
         proj_rus_text:       'The Russian-language music channel is coming back. Follow the news on Telegram.',
         proj_rus_btn:        'Follow on Telegram',
-        footer:              'Presented by BM-PR. Not affiated with BRIDGE MEDIA.',
-        history_title:       'Today in BRIDGE TV history',
+        footer:              'Presented by BM-PR. Not affiliated with BRIDGE MEDIA.',
         msg_title:           'Write on screen',
         msg_label_text:      'Message',
         msg_label_name:      'Name',
@@ -422,8 +403,7 @@
         proj_btv_text:       'Сейчас в эфире: архивные записи, классические клипы и новая музыка в духе оригинального канала.',
         proj_rus_text:       'Русскоязычный музыкальный канал возвращается. Следите за новостями в Telegram.',
         proj_rus_btn:        'Следить в Telegram',
-        footer:              '\u041f\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u043e \u043a\u043e\u043c\u0430\u043d\u0434\u043e\u0439 BM-PR.',
-        history_title:       '\u0421\u0435\u0433\u043e\u0434\u043d\u044f \u0432 \u0438\u0441\u0442\u043e\u0440\u0438\u0438 BRIDGE TV',
+        footer:              '\u041f\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u043e \u043a\u043e\u043c\u0430\u043d\u0434\u043e\u0439 BM-PR. \u041d\u0435 \u0438\u043c\u0435\u0435\u0442 \u043e\u0442\u043d\u043e\u0448\u0435\u043d\u0438\u044f \u043a BRIDGE MEDIA.',
         msg_title:           '\u041d\u0430\u043f\u0438\u0441\u0430\u0442\u044c \u043d\u0430 \u044d\u043a\u0440\u0430\u043d',
         msg_label_text:      '\u0421\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435',
         msg_label_name:      '\u0418\u043c\u044f',
