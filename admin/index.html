@@ -559,6 +559,9 @@
     });
   }
 
+  /* ── Открыть раздел по ссылке вида index.html#inbox ── */
+  if (['send','log','inbox'].includes(location.hash.slice(1))) showPage(location.hash.slice(1));
+
   /* ── Keyboard shortcut: Ctrl+Enter to send ── */
   document.addEventListener('keydown', e => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') sendMessage();
