@@ -61,6 +61,34 @@ KINDS = {"wait": "wait", "ожидание": "wait", "ad": "ad", "реклама
          "tech": "tech", "техника": "tech", "неполадки": "tech", "пауза": "tech"}
 
 
+# Заставки программ: имя файла клипа -> название программы (роль — начало/переход/на рекламу/с рекламы/конец — определяется по соседям).
+# TOP10 — чарт, а не ротация клипов: роли «часть 1», «часть 2»…
+SHOWS = [(r"baby[\W_]*time", "Baby Time"), (r"bridge[\W_]*in[\W_]*time", "Bridge In Time"),
+         (r"retro[\W_]*dance", "Retro Dance"), (r"night[\W_]*life", "Bridge to Nightlife"),
+         (r"rock[\W_]*party", "Rock Party Time"), (r"wake[\W_]*up[\W_]*call", "Wake Up Call"),
+         (r"top[\W_]*10|топ[\W_]*10", "BRIDGE TV TOP10")]
+CHART = "BRIDGE TV TOP10"
+
+
+def show_roles(items):
+    """items: [(t, raw, kind)] в порядке эфира; kind 'show:<Имя>' -> {индекс: роль}"""
+    idx = {}
+    for i, it in enumerate(items):
+        if it[2] and it[2].startswith("show:"): idx.setdefault(it[2][5:], []).append(i)
+    roles = {}
+    for name, pos in idx.items():
+        for n, i in enumerate(pos):
+            if name == CHART: roles[i] = "part%d" % (n + 1); continue
+            prev_ad = i > 0 and items[i-1][2] == "ad"
+            next_ad = i + 1 < len(items) and items[i+1][2] == "ad"
+            if n == 0: roles[i] = "start"
+            elif n == len(pos) - 1: roles[i] = "end"
+            elif prev_ad: roles[i] = "back"
+            elif next_ad: roles[i] = "to_ad"
+            else: roles[i] = "transition"
+    return roles
+
+
 def split_kind(name):
     """«[tech] текст» -> ("tech", "текст"); обычный трек -> (None, name)."""
     m = re.match(r"^\s*[\[#]\s*([^\]\s]+)\s*\]?\s*(.*)$", name)
@@ -327,7 +355,7 @@ def build_tracks(proj, min_track=30, rules=None):
         rows = [(t, n) for t, n in proj["markers"]]
         mode = "text" if proj["fmt"] == "TXT" else "markers"
     elif proj["clips"]:
-        rules = list(rules or []) + DEFAULT_RULES
+        rules = list(rules or []) + [(p, "show:" + n) for p, n in SHOWS] + DEFAULT_RULES
         picked = []
         for t, raw, dur, keep in proj["clips"]:
             kind = None
@@ -342,8 +370,10 @@ def build_tracks(proj, min_track=30, rules=None):
             merged.append((t, raw, kind))
         if not merged: raise ProjectError("В проекте не найдено клипов подходящей длины")
         rows = []
-        for t, raw, kind in merged:
-            rows.append((t, "[%s]" % kind if kind in ("ad", "promo", "wait", "tech") else clean_clip_name(raw)))
+        roles = show_roles(merged)
+        for i, (t, raw, kind) in enumerate(merged):
+            if kind and kind.startswith("show:"): rows.append((t, "[show:%s|%s]" % (kind[5:], roles[i])))
+            else: rows.append((t, "[%s]" % kind if kind in ("ad", "promo", "wait", "tech") else clean_clip_name(raw)))
         rows = [r for i, r in enumerate(rows) if not (i and r[1] == rows[i-1][1] and r[1].startswith("["))]
         mode = "cutlist"
     else:
@@ -352,6 +382,9 @@ def build_tracks(proj, min_track=30, rules=None):
     for t, name in rows:
         t = round(t, 2)
         if t < 0: raise ProjectError("Отрицательное время у «%s» — проверьте начальный таймкод" % name)
+        sm = re.match(r"^\[show:(.+)\|(\w+)\]$", name)
+        if sm:
+            tracks.append({"t": t, "kind": "show", "show": sm.group(1), "role": sm.group(2)}); continue
         kind, rest = split_kind(name)
         if kind:
             tracks.append({"t": t, "kind": kind, "text": rest})      # служебный блок (пустой text — шутка по умолчанию)

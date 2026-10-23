@@ -102,7 +102,7 @@ summary{cursor:pointer;color:var(--muted);font-size:.9rem;margin-bottom:8px}
       <h2>Треклист <span id="resInfo" class="badge"></span></h2>
       <p class="hint">Время — от начала эфира. Поправьте исполнителя и название, поменяйте вид блока, добавьте или удалите строки.</p>
       <div class="warns" id="warns"></div>
-      <table class="tbl"><thead><tr><th>Время</th><th>Вид</th><th>Исполнитель / текст блока</th><th>Название</th><th></th></tr></thead><tbody id="rows"></tbody></table>
+      <datalist id="roles"><option value="start"><option value="transition"><option value="to_ad"><option value="back"><option value="end"><option value="part1"><option value="part2"></datalist><table class="tbl"><thead><tr><th>Время</th><th>Вид</th><th>Исполнитель / текст блока</th><th>Название</th><th></th></tr></thead><tbody id="rows"></tbody></table>
       <div class="row" style="margin-top:12px"><button class="btn" id="addRow">+ строка</button></div>
       <div class="sum" id="sum"></div>
       <div class="row" style="margin-top:6px">
@@ -219,26 +219,26 @@ $("loadSel").onchange = () => { const n = $("loadSel").value; if (!n) return; ru
   $("saveName").value = n; $("resInfo").textContent = "сохранённый эфир"; $("resultCard").hidden = false; renderRows(); log("Открыт эфир " + n, "ok"); }); };
 
 /* таблица */
-const KIND = {"": "Трек", wait: "Ожидание", ad: "Реклама", promo: "Заставки", tech: "Техника"};
+const KIND = {"": "Трек", wait: "Ожидание", ad: "Реклама", promo: "Заставки", tech: "Техника", show: "Заставка программы"};
 const fmt = (s) => { s = Math.max(0, Math.round(s)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ":" : "") + String(m).padStart(h ? 2 : 1, "0") + ":" + String(x).padStart(2, "0"); };
 const parseT = (v) => { const p = String(v).trim().split(":").map(Number); if (p.some(isNaN) || !p.length) return null; return p.reduce((a, n) => a * 60 + n, 0); };
 function renderRows() {
   const tb = $("rows"); tb.replaceChildren();
   episode.tracks.forEach((t, i) => {
-    const tr = document.createElement("tr"); const svc = !!t.kind; if (svc) tr.className = "svc";
+    const tr = document.createElement("tr"); const svc = !!t.kind, sh = t.kind === "show"; if (svc) tr.className = "svc";
     tr.innerHTML = `<td class="t"><input value="${fmt(t.t)}" data-f="t"></td>
       <td class="k"><select data-f="kind">${Object.entries(KIND).map(([k, v]) => `<option value="${k}"${(t.kind || "") === k ? " selected" : ""}>${v}</option>`).join("")}</select></td>
-      <td class="a"><input data-f="a" placeholder="${svc ? "свой текст (необязательно — будет шутка)" : "Исполнитель"}"></td>
-      <td class="b"><input data-f="b" placeholder="Название"${svc ? " disabled" : ""}></td>
+      <td class="a"><input data-f="a" placeholder="${sh ? "Название программы" : svc ? "свой текст (необязательно — будет шутка)" : "Исполнитель"}"></td>
+      <td class="b"><input data-f="b" placeholder="${sh ? "роль: start, transition, to_ad, back, end, part1" : "Название"}" list="roles"${svc && !sh ? " disabled" : ""}></td>
       <td class="x">${svc ? "" : '<button class="del" title="Поменять исполнителя и название местами" data-f="swap">⇄</button>'}<button class="del" title="Удалить" data-f="del">×</button></td>`;
-    tr.querySelector('[data-f="a"]').value = svc ? (t.text || "") : (t.artist || "");
-    tr.querySelector('[data-f="b"]').value = svc ? "" : (t.title || "");
+    tr.querySelector('[data-f="a"]').value = sh ? (t.show || "") : svc ? (t.text || "") : (t.artist || "");
+    tr.querySelector('[data-f="b"]').value = sh ? (t.role || "") : svc ? "" : (t.title || "");
     tr.addEventListener("change", (e) => {
       const f = e.target.dataset.f, row = episode.tracks[i];
       if (f === "t") { const v = parseT(e.target.value); if (v === null) { e.target.value = fmt(row.t); return; } row.t = v; }
-      if (f === "kind") { const k = e.target.value; if (k) { row.kind = k; row.text = row.artist || row.title || ""; delete row.artist; delete row.title; } else { delete row.kind; row.artist = row.text || ""; row.title = ""; delete row.text; } renderRows(); return; }
-      if (f === "a") { if (row.kind) row.text = e.target.value; else row.artist = e.target.value; }
-      if (f === "b") row.title = e.target.value;
+      if (f === "kind") { const k = e.target.value; if (k) { row.kind = k; if (k === "show") { row.show = row.artist || row.text || ""; row.role = "start"; delete row.text; } else row.text = row.artist || row.title || ""; delete row.artist; delete row.title; } else { delete row.kind; row.artist = row.text || ""; row.title = ""; delete row.text; } renderRows(); return; }
+      if (f === "a") { if (row.kind === "show") row.show = e.target.value; else if (row.kind) row.text = e.target.value; else row.artist = e.target.value; }
+      if (f === "b") { if (row.kind === "show") row.role = e.target.value.trim() || "start"; else row.title = e.target.value; }
       summary();
     });
     const sw = tr.querySelector('[data-f="swap"]'); if (sw) sw.onclick = () => { const r = episode.tracks[i]; [r.artist, r.title] = [r.title, r.artist]; renderRows(); };
