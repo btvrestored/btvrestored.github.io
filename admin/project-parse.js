@@ -47,6 +47,25 @@
     return roles;
   }
 
+  var ROLE_WORDS = [[/част[ьи]?\s*(\d+)|part\s*(\d+)/i, 'part'], [/с рекламы|после рекл|возвр|вернул|back/i, 'back'], [/на рекл|уход|to[_ ]?ad/i, 'to_ad'],
+    [/переход|transition/i, 'transition'], [/конец|финал|заверш|\bend\b/i, 'end'], [/нач|старт|start/i, 'start']];
+  function matchShow(name) {   /* «Baby Time — конец», «TOP10 часть 2» → [программа, роль|null]; иначе null */
+    var parts = name.trim().split(/\s+[-–—]\s+|\s*[:|]\s*/), head = parts[0], tail = parts.length > 1 ? parts.slice(1).join(' ') : '';
+    if (parts.length > 2) { var m2 = /^(.*?)(?:\s+[-–—]\s+|\s*[:|]\s*)(.*)$/.exec(name.trim()); head = m2[1]; tail = m2[2]; }
+    for (var i = 0; i < SHOWS.length; i++) {
+      if (head.length <= 40 && SHOWS[i][0].test(head)) {
+        var rest = (tail || head.replace(SHOWS[i][0], '')).trim(), role = null;
+        for (var j = 0; j < ROLE_WORDS.length; j++) {
+          var m = ROLE_WORDS[j][0].exec(rest);
+          if (m) { role = ROLE_WORDS[j][1] === 'part' ? 'part' + (m[1] || m[2]) : ROLE_WORDS[j][1]; break; }
+        }
+        if (tail && role === null) return null;
+        return [SHOWS[i][1], role];
+      }
+    }
+    return null;
+  }
+
   var DEFAULT_RULES = [[/рекламн|adsstart|\bads?\b/i, 'ad']];
   var JUNK = /[\[(][^\])]*\b(official|hd|4k|video|music|audio|lyric|lyrics|clip|version|\d{3,4}p(_hd)?)\b[^\])]*[\])]/ig;
 
@@ -250,6 +269,11 @@
       rows = rows.filter(function (r, i) { return !(i && r[1] === rows[i - 1][1] && r[1].charAt(0) === '['); });
       mode = 'cutlist';
     } else throw ProjectError('Маркеры не найдены');
+    if (mode !== 'cutlist') {
+      var items = rows.map(function (r) { var ms = matchShow(r[1]), k = splitKind(r[1])[0]; return [r[0], r[1], ms ? 'show:' + ms[0] : k]; });
+      var rl = showRoles(items);
+      rows = rows.map(function (r, i) { return items[i][2] && items[i][2].indexOf('show:') === 0 ? [r[0], '[show:' + items[i][2].slice(5) + '|' + (matchShow(r[1])[1] || rl[i]) + ']'] : r; });
+    }
     var tracks = rows.map(function (r) {
       var t = r2(r[0]);
       if (t < 0) throw ProjectError('Отрицательное время у «' + r[1] + '» — проверьте начальный таймкод');

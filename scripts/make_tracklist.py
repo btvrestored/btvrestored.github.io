@@ -70,6 +70,27 @@ SHOWS = [(r"baby[\W_]*time", "Baby Time"), (r"bridge[\W_]*in[\W_]*time", "Bridge
 CHART = "BRIDGE TV TOP10"
 
 
+ROLE_WORDS = [(r"част[ьи]?\s*(\d+)|part\s*(\d+)", "part"), (r"с рекламы|после рекл|возвр|вернул|back", "back"),
+              (r"на рекл|уход|to[_ ]?ad", "to_ad"), (r"переход|transition", "transition"),
+              (r"конец|финал|заверш|\bend\b", "end"), (r"нач|старт|start", "start")]
+
+
+def match_show(name):
+    """Маркер «Rock Party Time» / «Baby Time — конец» / «TOP10 часть 2» -> (программа, роль|None); иначе None."""
+    parts = re.split(r"\s+[-–—]\s+|\s*[:|]\s*", name.strip(), maxsplit=1)
+    head, tail = parts[0], (parts[1] if len(parts) > 1 else "")
+    for pat, show in SHOWS:
+        if len(head) <= 40 and re.search(pat, head, re.I):
+            rest = (tail or re.sub(pat, "", head, flags=re.I)).strip()
+            role = None
+            for rp, r in ROLE_WORDS:
+                m = re.search(rp, rest, re.I)
+                if m: role = ("part%s" % (m.group(1) or m.group(2))) if r == "part" else r; break
+            if tail and role is None: return None            # «Baby Time - Something»: это трек, а не заставка
+            return show, role
+    return None
+
+
 def show_roles(items):
     """items: [(t, raw, kind)] в порядке эфира; kind 'show:<Имя>' -> {индекс: роль}"""
     idx = {}
@@ -378,6 +399,14 @@ def build_tracks(proj, min_track=30, rules=None):
         mode = "cutlist"
     else:
         raise ProjectError("Маркеры не найдены")
+    if mode in ("markers", "text"):                       # заставки программ среди маркеров
+        items = []
+        for t, n in rows:
+            ms = match_show(n); k, _ = split_kind(n)
+            items.append((t, n, ("show:" + ms[0]) if ms else k))
+        roles = show_roles(items)
+        rows = [(t, "[show:%s|%s]" % (items[i][2][5:], match_show(n)[1] or roles[i])) if items[i][2] and items[i][2].startswith("show:") else (t, n)
+                for i, (t, n) in enumerate(rows)]
     tracks = []
     for t, name in rows:
         t = round(t, 2)
