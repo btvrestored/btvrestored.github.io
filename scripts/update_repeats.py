@@ -188,7 +188,8 @@ def update_repeats(token, root=ROOT, owner_id=DEFAULT_OWNER, limit=24, log=print
         log("пропущено (%s): %d — %s" % (why, len(names), "; ".join(names[:5])))
 
     try:
-        old = json.load(open(out, encoding="utf-8")).get("items", [])
+        with open(out, encoding="utf-8") as f:
+            old = json.load(f).get("items", [])
     except Exception:
         old = []
 
@@ -201,11 +202,13 @@ def update_repeats(token, root=ROOT, owner_id=DEFAULT_OWNER, limit=24, log=print
 
     new = json.dumps({"items": items}, ensure_ascii=False, indent=1) + "\n"
     try:
-        same = open(out, encoding="utf-8").read() == new
+        with open(out, encoding="utf-8") as f:
+            same = f.read() == new
     except FileNotFoundError:
         same = False
     if not same:
-        open(out, "w", encoding="utf-8").write(new)
+        with open(out, "w", encoding="utf-8") as f:
+            f.write(new)
     return len(items), not same
 
 
