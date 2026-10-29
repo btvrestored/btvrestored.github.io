@@ -6,7 +6,9 @@
 
 Что делает:
   • читает ВСЕ видео владельца(ев) постранично (не только первые 100);
-  • владельцев может быть несколько: VK_OWNER_IDS="-232964863,36245613" (группа и/или страница);
+  • владельцев может быть несколько: VK_OWNER_IDS="-232964863,@btv_restored" — числа (группа с минусом) или адреса
+    каналов/страниц VK Видео (@btv_restored, https://vkvideo.ru/@btv_restored) — они переводятся в ID через API;
+  • кроме общего списка, просматриваются и все альбомы владельца;
   • идущие, ожидающие и ещё обрабатываемые трансляции пропускает — запись появится после конца эфира;
   • если VK не отдал готовый плеер, строит ссылку-встройку по owner_id и id;
   • в журнал пишет, сколько записей найдено и почему какие-то пропущены.
@@ -14,7 +16,7 @@
 import json, os, sys, urllib.parse, urllib.request
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-DEFAULT_OWNER = -232964863
+DEFAULT_OWNER = "-232964863,@btv_restored"
 LIVE_NOW = ("waiting", "started", "upcoming")
 
 
@@ -32,7 +34,17 @@ def _embed(it):
     return p
 
 
+def _vk(method, token, **params):
+    params.update({"v": "5.199", "access_token": token})
+    with urllib.request.urlopen("https://api.vk.com/method/%s?%s" % (method, urllib.parse.urlencode(params)), timeout=30) as r:
+        data = json.load(r)
+    if "error" in data:
+        raise RuntimeError("VK API %s: %s" % (method, data["error"].get("error_msg")))
+    return data["response"]
+
+
 def _owners(owner_id):
+    """Список владельцев: числа или адреса (@имя, ссылка). Числа — как есть, адреса позже переводятся в ID."""
     if isinstance(owner_id, (list, tuple)):
         raw = owner_id
     else:
@@ -40,30 +52,63 @@ def _owners(owner_id):
     out = []
     for x in raw:
         x = str(x).strip()
-        if x:
+        if not x:
+            continue
+        try:
             out.append(int(x))
+        except ValueError:
+            out.append(x)
     return out or [DEFAULT_OWNER]
 
 
-def _fetch_all(token, owner, log):
-    """Все видео владельца постранично."""
+def _resolve(token, owner, log):
+    """@btv_restored / ссылка / короткое имя -> числовой ID владельца (для группы — отрицательный)."""
+    if isinstance(owner, int):
+        return owner
+    name = owner.rstrip("/").split("/")[-1].lstrip("@")
+    res = _vk("utils.resolveScreenName", token, screen_name=name)
+    if not res or not res.get("object_id"):
+        raise RuntimeError("VK не знает адрес «%s»" % owner)
+    oid = -int(res["object_id"]) if res.get("type") in ("group", "public", "event") else int(res["object_id"])
+    log("адрес %s → owner_id %s (%s)" % (owner, oid, res.get("type")))
+    return oid
+
+
+def _list(token, owner, album_id=None):
     items, offset, total = [], 0, None
     while True:
-        q = urllib.parse.urlencode({"owner_id": owner, "count": 200, "offset": offset, "extended": 0,
-                                    "v": "5.199", "access_token": token})
-        with urllib.request.urlopen("https://api.vk.com/method/video.get?" + q, timeout=30) as r:
-            data = json.load(r)
-        if "error" in data:
-            raise RuntimeError("VK API error (owner %s): %s" % (owner, data["error"].get("error_msg")))
-        resp = data["response"]
+        params = {"owner_id": owner, "count": 200, "offset": offset, "extended": 0}
+        if album_id is not None:
+            params["album_id"] = album_id
+        resp = _vk("video.get", token, **params)
         page = resp.get("items", [])
         total = resp.get("count", total)
         items += page
         offset += len(page)
         if not page or (total is not None and offset >= total) or offset >= 2000:
             break
-    log("owner %s: VK вернул %d видео" % (owner, len(items)))
     return items
+
+
+def _fetch_all(token, owner, log):
+    """Все видео владельца: общий список + каждый альбом (дубли убираются)."""
+    got = {}
+    for it in _list(token, owner):
+        got[(it["owner_id"], it["id"])] = it
+    n_main = len(got)
+    try:
+        albums = _vk("video.getAlbums", token, owner_id=owner, count=100).get("items", [])
+    except RuntimeError as e:
+        albums = []
+        log("альбомы недоступны: %s" % e)
+    for al in albums:
+        try:
+            for it in _list(token, owner, al["id"]):
+                got.setdefault((it["owner_id"], it["id"]), it)
+        except RuntimeError as e:
+            log("альбом «%s»: %s" % (al.get("title"), e))
+    log("owner %s: общий список — %d видео, альбомов — %d, всего уникальных — %d" % (owner, n_main, len(albums), len(got)))
+    return list(got.values())
 
 
 def update_repeats(token, root=ROOT, owner_id=DEFAULT_OWNER, limit=24, log=print):
@@ -73,7 +118,7 @@ def update_repeats(token, root=ROOT, owner_id=DEFAULT_OWNER, limit=24, log=print
     out = os.path.join(root, "repeats.json")
 
     fresh, skipped = [], {}
-    for owner in _owners(owner_id):
+    for owner in [_resolve(token, o, log) for o in _owners(owner_id)]:
         for it in _fetch_all(token, owner, log):
             why = None
             if it.get("live") or it.get("live_status") in LIVE_NOW:

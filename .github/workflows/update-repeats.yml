@@ -16,7 +16,7 @@ jobs:
       - name: Fetch finished broadcasts from VK
         env:
           VK_TOKEN: ${{ secrets.VK_TOKEN }}
-          VK_OWNER_IDS: ${{ vars.VK_OWNER_IDS }}      # необязательно: «-232964863,36245613»
+          VK_OWNER_IDS: ${{ vars.VK_OWNER_IDS }}      # необязательно: «-232964863,@btv_restored»
         run: python3 scripts/update_repeats.py
       - name: Commit if changed
         run: |
