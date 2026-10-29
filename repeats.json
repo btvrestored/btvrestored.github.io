@@ -2,10 +2,45 @@
  "items": [
   {
    "oid": -232964863,
+   "id": 456239045,
+   "title": "Клипы + BRIDGE TV TOP 10 (24.10.26, Part 2)",
+   "date": 1792838733,
+   "embed": "https://vkvideo.ru/video_ext.php?oid=-232964863&id=456239045&hash=9ad4988435eaea56&__ref=vk.api&hd=4"
+  },
+  {
+   "oid": -232964863,
+   "id": 456239044,
+   "title": "Клипы + BRIDGE TV TOP 10 (24.10.26, Part 1)",
+   "date": 1792835949,
+   "embed": "https://vkvideo.ru/video_ext.php?oid=-232964863&id=456239044&hash=676aaee7e29252e0&__ref=vk.api&hd=4"
+  },
+  {
+   "oid": -232964863,
    "id": 456239043,
    "title": "Эфир от 4 октября 2025 (архивный эфир)",
    "date": 1792262219,
    "embed": "https://vkvideo.ru/video_ext.php?oid=-232964863&id=456239043&hash=c1d3e74ed96801eb&__ref=vk.api&hd=4"
+  },
+  {
+   "oid": -232964863,
+   "id": 456239036,
+   "title": "ROCK PARTY TIME on BTV-PR #1 (22.08.26)",
+   "date": 1787406423,
+   "embed": "https://vkvideo.ru/video_ext.php?oid=-232964863&id=456239036&hash=144aba5220bf99e7&__ref=vk.api&hd=4"
+  },
+  {
+   "oid": -232964863,
+   "id": 456239034,
+   "title": "Music on BTV-PR (24.05.26)",
+   "date": 1779638898,
+   "embed": "https://vkvideo.ru/video_ext.php?oid=-232964863&id=456239034&hash=c9f7fd7ff0fb446b&__ref=vk.api&hd=4"
+  },
+  {
+   "oid": -232964863,
+   "id": 456239025,
+   "title": "Music on BTV-PR (09.01.26)",
+   "date": 1767974285,
+   "embed": "https://vkvideo.ru/video_ext.php?oid=-232964863&id=456239025&hash=90ee63da785411c8&__ref=vk.api&hd=4"
   },
   {
    "oid": -232964863,
@@ -41,27 +76,6 @@
    "title": "Заставка BRIDGE TV (Project Restored) - BTV-PR",
    "date": 1759067306,
    "embed": "https://vkvideo.ru/video_ext.php?oid=-232964863&id=456239017&hash=b0b7f254ee6c3c5b&__ref=vk.api&hd=4"
-  },
-  {
-   "oid": -232964863,
-   "id": 456239036,
-   "title": "Повтор эфира №1",
-   "date": null,
-   "embed": "https://vkvideo.ru/video_ext.php?oid=-232964863&id=456239036&hash=144aba5220bf99e7&hd=4"
-  },
-  {
-   "oid": -232964863,
-   "id": 456239034,
-   "title": "Повтор эфира №2",
-   "date": null,
-   "embed": "https://vkvideo.ru/video_ext.php?oid=-232964863&id=456239034&hash=c9f7fd7ff0fb446b&hd=4"
-  },
-  {
-   "oid": -232964863,
-   "id": 456239025,
-   "title": "Повтор эфира №3",
-   "date": null,
-   "embed": "https://vkvideo.ru/video_ext.php?oid=-232964863&id=456239025&hash=90ee63da785411c8&hd=4"
   }
  ]
 }
