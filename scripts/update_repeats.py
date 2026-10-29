@@ -62,16 +62,51 @@ def _owners(owner_id):
 
 
 def _resolve(token, owner, log):
-    """@btv_restored / ссылка / короткое имя -> числовой ID владельца (для группы — отрицательный)."""
+    """Числовой ID или адрес VK -> owner_id. Для сообщества возвращает отрицательный ID."""
     if isinstance(owner, int):
         return owner
     name = owner.rstrip("/").split("/")[-1].lstrip("@")
-    res = _vk("utils.resolveScreenName", token, screen_name=name)
-    if not res or not res.get("object_id"):
-        raise RuntimeError("VK не знает адрес «%s»" % owner)
-    oid = -int(res["object_id"]) if res.get("type") in ("group", "public", "event") else int(res["object_id"])
-    log("адрес %s → owner_id %s (%s)" % (owner, oid, res.get("type")))
-    return oid
+    errors = []
+
+    # Some VK token/profile types cannot call utils.resolveScreenName. Try the
+    # dedicated community/user lookups as fallbacks; both accept screen names.
+    try:
+        res = _vk("utils.resolveScreenName", token, screen_name=name)
+        if res and res.get("object_id"):
+            oid = -int(res["object_id"]) if res.get("type") in ("group", "public", "event") else int(res["object_id"])
+            log("адрес %s → owner_id %s (%s)" % (owner, oid, res.get("type")))
+            return oid
+        errors.append("utils.resolveScreenName не нашёл адрес")
+    except RuntimeError as e:
+        errors.append(str(e))
+
+    try:
+        groups = _vk("groups.getById", token, group_id=name)
+        if isinstance(groups, dict):
+            groups = [groups]
+        if groups:
+            oid = -int(groups[0]["id"])
+            log("адрес %s → owner_id %s (groups.getById)" % (owner, oid))
+            return oid
+    except (RuntimeError, KeyError, TypeError, ValueError) as e:
+        errors.append(str(e))
+
+    try:
+        users = _vk("users.get", token, user_ids=name)
+        if isinstance(users, dict):
+            users = [users]
+        if users:
+            oid = int(users[0]["id"])
+            log("адрес %s → owner_id %s (users.get)" % (owner, oid))
+            return oid
+    except (RuntimeError, KeyError, TypeError, ValueError) as e:
+        errors.append(str(e))
+
+    detail = "; ".join(errors[-3:])
+    raise RuntimeError(
+        "Не удалось определить VK-адрес «%s». Укажите числовой owner_id "
+        "(для сообщества — с минусом). Детали: %s" % (owner, detail)
+    )
 
 
 def _list(token, owner, album_id=None):
@@ -118,7 +153,22 @@ def update_repeats(token, root=ROOT, owner_id=DEFAULT_OWNER, limit=24, log=print
     out = os.path.join(root, "repeats.json")
 
     fresh, skipped = [], {}
-    for owner in [_resolve(token, o, log) for o in _owners(owner_id)]:
+    fresh_keys = set()
+    owners = []
+    for raw_owner in _owners(owner_id):
+        try:
+            resolved = _resolve(token, raw_owner, log)
+        except RuntimeError as e:
+            # One unsupported alias must not prevent all other known numeric
+            # owners from refreshing the archive.
+            log("владелец %s пропущен: %s" % (raw_owner, e))
+            continue
+        if resolved not in owners:
+            owners.append(resolved)
+    if not owners:
+        raise RuntimeError("Не удалось определить ни одного владельца VK; repeats.json не изменён.")
+
+    for owner in owners:
         for it in _fetch_all(token, owner, log):
             why = None
             if it.get("live") or it.get("live_status") in LIVE_NOW:
@@ -128,6 +178,10 @@ def update_repeats(token, root=ROOT, owner_id=DEFAULT_OWNER, limit=24, log=print
             if why:
                 skipped.setdefault(why, []).append(it.get("title") or str(it.get("id")))
                 continue
+            key = (it["owner_id"], it["id"])
+            if key in fresh_keys:
+                continue
+            fresh_keys.add(key)
             fresh.append({"oid": it["owner_id"], "id": it["id"], "title": (it.get("title") or "").strip(),
                           "date": it.get("date"), "embed": _embed(it)})
     for why, names in skipped.items():
