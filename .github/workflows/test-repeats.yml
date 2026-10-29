@@ -1,0 +1,27 @@
+name: Test VK repeats updater
+on:
+  push:
+    branches:
+      - "fix/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "scripts/update_repeats.py"
+      - "scripts/test_update_repeats.py"
+      - "AUTOMATION-repeats.md"
+      - ".github/workflows/test-repeats.yml"
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check Python syntax
+        run: python -m py_compile scripts/update_repeats.py scripts/test_update_repeats.py
+      - name: Run offline regression tests
+        run: python scripts/test_update_repeats.py
