@@ -96,5 +96,53 @@ class ResolveOwnerTests(unittest.TestCase):
                 self.assertEqual(f.read(), original)
 
 
+class LiveRecordingTests(unittest.TestCase):
+    def test_finished_livestream_with_duration_is_not_treated_as_live_now(self):
+        item = {
+            "owner_id": -232964863,
+            "id": 456239099,
+            "title": "Finished BTV broadcast",
+            "date": 1792262219,
+            "live": 1,
+            "duration": 7200,
+        }
+        self.assertFalse(UR._is_unfinished_live(item))
+
+    def test_live_status_started_is_still_skipped(self):
+        item = {"live": 1, "duration": 0, "live_status": "started"}
+        self.assertTrue(UR._is_unfinished_live(item))
+
+    def test_upcoming_flag_is_still_skipped(self):
+        item = {"live": 1, "upcoming": 1, "duration": 0}
+        self.assertTrue(UR._is_unfinished_live(item))
+
+    def test_finished_livestream_is_written_to_repeats_json(self):
+        with tempfile.TemporaryDirectory() as root:
+            logs = []
+            item = {
+                "owner_id": -232964863,
+                "id": 456239099,
+                "title": "Finished BTV broadcast",
+                "date": 1792262219,
+                "live": 1,
+                "duration": 7200,
+            }
+            with patch.object(UR, "_resolve", return_value=-232964863), \
+                 patch.object(UR, "_fetch_all", return_value=[item]):
+                count, changed = UR.update_repeats(
+                    "fake-token", root, None, 48, log=logs.append
+                )
+            self.assertEqual(count, 1)
+            self.assertTrue(changed)
+            self.assertFalse(any("эфир ещё идёт" in line for line in logs))
+            with open(os.path.join(root, "repeats.json"), encoding="utf-8") as f:
+                saved = json.load(f)
+            self.assertEqual(saved["items"][0]["id"], 456239099)
+
+    def test_default_owner_is_the_known_numeric_community_id(self):
+        self.assertEqual(UR.DEFAULT_OWNER, "-232964863")
+        self.assertEqual(UR._owners(None), [-232964863])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

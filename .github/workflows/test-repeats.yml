@@ -9,6 +9,8 @@ on:
     paths:
       - "scripts/update_repeats.py"
       - "scripts/test_update_repeats.py"
+      - "scripts/gui.py"
+      - "scripts/gui.html"
       - "AUTOMATION-repeats.md"
       - ".github/workflows/test-repeats.yml"
 permissions:
@@ -22,6 +24,6 @@ jobs:
         with:
           python-version: "3.12"
       - name: Check Python syntax
-        run: python -m py_compile scripts/update_repeats.py scripts/test_update_repeats.py
+        run: python -m py_compile scripts/update_repeats.py scripts/test_update_repeats.py scripts/gui.py
       - name: Run offline regression tests
         run: python scripts/test_update_repeats.py

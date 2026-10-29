@@ -16,7 +16,7 @@
 import json, os, sys, urllib.parse, urllib.request
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-DEFAULT_OWNER = "-232964863,@btv_restored"
+DEFAULT_OWNER = "-232964863"
 LIVE_NOW = ("waiting", "started", "upcoming")
 
 
@@ -58,7 +58,7 @@ def _owners(owner_id):
             out.append(int(x))
         except ValueError:
             out.append(x)
-    return out or [DEFAULT_OWNER]
+    return out or [int(DEFAULT_OWNER)]
 
 
 def _resolve(token, owner, log):
@@ -125,6 +125,40 @@ def _list(token, owner, album_id=None):
     return items
 
 
+def _flag(value):
+    """Treat VK's integer 1, boolean true, and string '1' as a set flag."""
+    return value is True or value == 1 or value == "1"
+
+
+def _is_unfinished_live(item):
+    """Distinguish an ongoing stream from an archived recording of a livestream.
+
+    VK's `live` field means the video is a livestream-type video; it does not
+    by itself mean that the stream is still in progress. Use explicit live
+    statuses/upcoming first, and duration as a fallback for live entries whose
+    current status is missing.
+    """
+    status = str(item.get("live_status") or "").strip().lower()
+    if status in LIVE_NOW:
+        return True
+    if _flag(item.get("upcoming")):
+        return True
+
+    if _flag(item.get("live")):
+        if status in ("finished", "ended", "completed", "failed", "stopped"):
+            return False
+        try:
+            duration = int(item.get("duration") or 0)
+        except (TypeError, ValueError):
+            duration = 0
+        # Live-type videos with a known positive duration are archived
+        # recordings. A zero/unknown duration with no terminal status is
+        # treated conservatively as a still-running stream.
+        return duration <= 0
+
+    return False
+
+
 def _fetch_all(token, owner, log):
     """Все видео владельца: общий список + каждый альбом (дубли убираются)."""
     got = {}
@@ -135,7 +169,7 @@ def _fetch_all(token, owner, log):
         albums = _vk("video.getAlbums", token, owner_id=owner, count=100).get("items", [])
     except RuntimeError as e:
         albums = []
-        log("альбомы недоступны: %s" % e)
+        log("альбомы недоступны (основной список продолжает обновляться; доступ к video.getAlbums ограничен): %s" % e)
     for al in albums:
         try:
             for it in _list(token, owner, al["id"]):
@@ -171,7 +205,7 @@ def update_repeats(token, root=ROOT, owner_id=DEFAULT_OWNER, limit=24, log=print
     for owner in owners:
         for it in _fetch_all(token, owner, log):
             why = None
-            if it.get("live") or it.get("live_status") in LIVE_NOW:
+            if _is_unfinished_live(it):
                 why = "эфир ещё идёт или ожидается"
             elif it.get("processing"):
                 why = "видео ещё обрабатывается"
