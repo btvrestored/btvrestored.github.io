@@ -16,7 +16,7 @@
 import json, os, sys, urllib.parse, urllib.request
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-DEFAULT_OWNER = "-232964863,@btv_restored"
+DEFAULT_OWNER = "-232964863"
 LIVE_NOW = ("waiting", "started", "upcoming")
 
 
@@ -58,20 +58,55 @@ def _owners(owner_id):
             out.append(int(x))
         except ValueError:
             out.append(x)
-    return out or [DEFAULT_OWNER]
+    return out or [int(DEFAULT_OWNER)]
 
 
 def _resolve(token, owner, log):
-    """@btv_restored / ссылка / короткое имя -> числовой ID владельца (для группы — отрицательный)."""
+    """Числовой ID или адрес VK -> owner_id. Для сообщества возвращает отрицательный ID."""
     if isinstance(owner, int):
         return owner
     name = owner.rstrip("/").split("/")[-1].lstrip("@")
-    res = _vk("utils.resolveScreenName", token, screen_name=name)
-    if not res or not res.get("object_id"):
-        raise RuntimeError("VK не знает адрес «%s»" % owner)
-    oid = -int(res["object_id"]) if res.get("type") in ("group", "public", "event") else int(res["object_id"])
-    log("адрес %s → owner_id %s (%s)" % (owner, oid, res.get("type")))
-    return oid
+    errors = []
+
+    # Some VK token/profile types cannot call utils.resolveScreenName. Try the
+    # dedicated community/user lookups as fallbacks; both accept screen names.
+    try:
+        res = _vk("utils.resolveScreenName", token, screen_name=name)
+        if res and res.get("object_id"):
+            oid = -int(res["object_id"]) if res.get("type") in ("group", "public", "event") else int(res["object_id"])
+            log("адрес %s → owner_id %s (%s)" % (owner, oid, res.get("type")))
+            return oid
+        errors.append("utils.resolveScreenName не нашёл адрес")
+    except RuntimeError as e:
+        errors.append(str(e))
+
+    try:
+        groups = _vk("groups.getById", token, group_id=name)
+        if isinstance(groups, dict):
+            groups = [groups]
+        if groups:
+            oid = -int(groups[0]["id"])
+            log("адрес %s → owner_id %s (groups.getById)" % (owner, oid))
+            return oid
+    except (RuntimeError, KeyError, TypeError, ValueError) as e:
+        errors.append(str(e))
+
+    try:
+        users = _vk("users.get", token, user_ids=name)
+        if isinstance(users, dict):
+            users = [users]
+        if users:
+            oid = int(users[0]["id"])
+            log("адрес %s → owner_id %s (users.get)" % (owner, oid))
+            return oid
+    except (RuntimeError, KeyError, TypeError, ValueError) as e:
+        errors.append(str(e))
+
+    detail = "; ".join(errors[-3:])
+    raise RuntimeError(
+        "Не удалось определить VK-адрес «%s». Укажите числовой owner_id "
+        "(для сообщества — с минусом). Детали: %s" % (owner, detail)
+    )
 
 
 def _list(token, owner, album_id=None):
@@ -90,6 +125,40 @@ def _list(token, owner, album_id=None):
     return items
 
 
+def _flag(value):
+    """Treat VK's integer 1, boolean true, and string '1' as a set flag."""
+    return value is True or value == 1 or value == "1"
+
+
+def _is_unfinished_live(item):
+    """Distinguish an ongoing stream from an archived recording of a livestream.
+
+    VK's `live` field means the video is a livestream-type video; it does not
+    by itself mean that the stream is still in progress. Use explicit live
+    statuses/upcoming first, and duration as a fallback for live entries whose
+    current status is missing.
+    """
+    status = str(item.get("live_status") or "").strip().lower()
+    if status in LIVE_NOW:
+        return True
+    if _flag(item.get("upcoming")):
+        return True
+
+    if _flag(item.get("live")):
+        if status in ("finished", "ended", "completed", "failed", "stopped"):
+            return False
+        try:
+            duration = int(item.get("duration") or 0)
+        except (TypeError, ValueError):
+            duration = 0
+        # Live-type videos with a known positive duration are archived
+        # recordings. A zero/unknown duration with no terminal status is
+        # treated conservatively as a still-running stream.
+        return duration <= 0
+
+    return False
+
+
 def _fetch_all(token, owner, log):
     """Все видео владельца: общий список + каждый альбом (дубли убираются)."""
     got = {}
@@ -100,7 +169,7 @@ def _fetch_all(token, owner, log):
         albums = _vk("video.getAlbums", token, owner_id=owner, count=100).get("items", [])
     except RuntimeError as e:
         albums = []
-        log("альбомы недоступны: %s" % e)
+        log("альбомы недоступны (основной список продолжает обновляться; доступ к video.getAlbums ограничен): %s" % e)
     for al in albums:
         try:
             for it in _list(token, owner, al["id"]):
@@ -118,23 +187,43 @@ def update_repeats(token, root=ROOT, owner_id=DEFAULT_OWNER, limit=24, log=print
     out = os.path.join(root, "repeats.json")
 
     fresh, skipped = [], {}
-    for owner in [_resolve(token, o, log) for o in _owners(owner_id)]:
+    fresh_keys = set()
+    owners = []
+    for raw_owner in _owners(owner_id):
+        try:
+            resolved = _resolve(token, raw_owner, log)
+        except RuntimeError as e:
+            # One unsupported alias must not prevent all other known numeric
+            # owners from refreshing the archive.
+            log("владелец %s пропущен: %s" % (raw_owner, e))
+            continue
+        if resolved not in owners:
+            owners.append(resolved)
+    if not owners:
+        raise RuntimeError("Не удалось определить ни одного владельца VK; repeats.json не изменён.")
+
+    for owner in owners:
         for it in _fetch_all(token, owner, log):
             why = None
-            if it.get("live") or it.get("live_status") in LIVE_NOW:
+            if _is_unfinished_live(it):
                 why = "эфир ещё идёт или ожидается"
             elif it.get("processing"):
                 why = "видео ещё обрабатывается"
             if why:
                 skipped.setdefault(why, []).append(it.get("title") or str(it.get("id")))
                 continue
+            key = (it["owner_id"], it["id"])
+            if key in fresh_keys:
+                continue
+            fresh_keys.add(key)
             fresh.append({"oid": it["owner_id"], "id": it["id"], "title": (it.get("title") or "").strip(),
                           "date": it.get("date"), "embed": _embed(it)})
     for why, names in skipped.items():
         log("пропущено (%s): %d — %s" % (why, len(names), "; ".join(names[:5])))
 
     try:
-        old = json.load(open(out, encoding="utf-8")).get("items", [])
+        with open(out, encoding="utf-8") as f:
+            old = json.load(f).get("items", [])
     except Exception:
         old = []
 
@@ -147,11 +236,13 @@ def update_repeats(token, root=ROOT, owner_id=DEFAULT_OWNER, limit=24, log=print
 
     new = json.dumps({"items": items}, ensure_ascii=False, indent=1) + "\n"
     try:
-        same = open(out, encoding="utf-8").read() == new
+        with open(out, encoding="utf-8") as f:
+            same = f.read() == new
     except FileNotFoundError:
         same = False
     if not same:
-        open(out, "w", encoding="utf-8").write(new)
+        with open(out, "w", encoding="utf-8") as f:
+            f.write(new)
     return len(items), not same
 
 
